@@ -28,7 +28,10 @@ func TestNew(t *testing.T) {
 	if lexer.offset != 0 {
 		t.Errorf("bad offset for lexer: got %v, expected %v", lexer.offset, 0)
 	}
-	if lexer.lineOffset != 0 {
-		t.Errorf("bad lineOffset for lexer: got %v, expected %v", lexer.lineOffset, 0)
+	if lexer.row != 0 {
+		t.Errorf("bad row for lexer: got %v, expected %v", lexer.row, 0)
+	}
+	if lexer.col != 0 {
+		t.Errorf("bad col for lexer: got %v, expected %v", lexer.col, 0)
 	}
 }

@@ -15,7 +15,8 @@ func New(src []byte, errHandler ErrorHandler) *Lexer {
 		errHandler: errHandler,
 		ch:         ' ',
 		offset:     0,
-		lineOffset: 0,
+		row:        0,
+		col:        0,
 	}
 
 	return lexer
@@ -28,7 +29,8 @@ type Lexer struct {
 	errHandler ErrorHandler
 
 	// lexing state
-	ch         rune // current character
-	offset     int  // character offset
-	lineOffset int  // current line offset
+	ch     rune // current character
+	offset int  // character offset
+	row    int  // current row, starts from 0
+	col    int  // column in current row, starts from 0. AKA current line offset
 }
