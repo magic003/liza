@@ -46,6 +46,11 @@ type Lexer struct {
 	col      int  // column in current line, starts from 1
 }
 
+// NextToken returns the next token from the source.
+func (l *Lexer) NextToken() *token.Token {
+	return nil
+}
+
 const bom = 0xFEFF // byte order mark, only permitted as very first character
 
 // next reads the next unicode char into Lexer.ch. Lexer.ch < 0 means end-of-file.
@@ -88,5 +93,11 @@ func (l *Lexer) error(line int, col int, msg string) {
 			Column:   l.col,
 		}
 		l.errHandler(pos, msg)
+	}
+}
+
+func (l *Lexer) skipWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.next()
 	}
 }
