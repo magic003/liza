@@ -9,6 +9,7 @@ const (
 	ILLEGAL Type = iota
 	EOF
 	COMMENT
+	NEWLINE
 
 	literalBeg
 	// Identifiers and basic type literals
