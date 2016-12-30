@@ -57,8 +57,7 @@ const bom = 0xFEFF // byte order mark, only permitted as very first character
 func (l *Lexer) next() {
 	// update line and col if current character is newline
 	if l.ch == '\n' {
-		l.line++
-		l.col = 0
+		l.increaseLineNumber()
 	}
 
 	if l.rdOffset == len(l.src) { // reach to eof
@@ -94,6 +93,11 @@ func (l *Lexer) error(line int, col int, msg string) {
 		}
 		l.errHandler(pos, msg)
 	}
+}
+
+func (l *Lexer) increaseLineNumber() {
+	l.line++
+	l.col = 0
 }
 
 func (l *Lexer) skipWhitespace() {
