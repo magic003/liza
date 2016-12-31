@@ -42,6 +42,10 @@ func TestNew(t *testing.T) {
 	if lexer.col != 2 {
 		t.Errorf("bad col for lexer: got %v, expected %v", lexer.col, 2)
 	}
+
+	if !lexer.ignoreNewline {
+		t.Errorf("bad ignoreNewline for lexer: got %v, expected %v", lexer.ignoreNewline, true)
+	}
 }
 
 func TestNextAscii(t *testing.T) {

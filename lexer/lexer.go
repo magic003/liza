@@ -13,13 +13,14 @@ type ErrorHandler func(pos token.Position, msg string)
 // New returns a new instance of lexer.
 func New(filename string, src []byte, errHandler ErrorHandler) *Lexer {
 	lexer := &Lexer{
-		filename:   filename,
-		src:        src,
-		errHandler: errHandler,
-		offset:     0,
-		rdOffset:   0,
-		line:       1,
-		col:        0,
+		filename:      filename,
+		src:           src,
+		errHandler:    errHandler,
+		offset:        0,
+		rdOffset:      0,
+		line:          1,
+		col:           0,
+		ignoreNewline: true,
 	}
 
 	// read in the first character
@@ -44,10 +45,24 @@ type Lexer struct {
 	rdOffset int  // reading offset (position after current character)
 	line     int  // current line, starts from 1
 	col      int  // column in current line, starts from 1
+
+	ignoreNewline bool // whether to ignore the next newline
 }
 
 // NextToken returns the next token from the source.
 func (l *Lexer) NextToken() *token.Token {
+	l.skipWhitespace()
+
+	pos := l.currentPosition()
+
+	ch := l.ch
+	switch ch {
+	case '\n':
+		l.next()
+		// only reach here if ignoreNewline was false and exited from skipWhitespace()
+		l.ignoreNewline = true
+		return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+	}
 	return nil
 }
 
@@ -100,8 +115,16 @@ func (l *Lexer) increaseLineNumber() {
 	l.col = 0
 }
 
+func (l *Lexer) currentPosition() token.Position {
+	return token.Position{
+		Filename: l.filename,
+		Line:     l.line,
+		Column:   l.col,
+	}
+}
+
 func (l *Lexer) skipWhitespace() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' {
+	for l.ch == ' ' || l.ch == '\t' || (l.ch == '\n' && l.ignoreNewline) || l.ch == '\r' {
 		l.next()
 	}
 }
