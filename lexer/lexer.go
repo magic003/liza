@@ -117,6 +117,7 @@ func (l *Lexer) next() {
 	if l.rdOffset == len(l.src) { // reach to eof
 		l.ch = -1
 		l.offset = len(l.src)
+		l.col++
 		return
 	}
 

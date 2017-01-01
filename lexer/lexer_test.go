@@ -312,3 +312,104 @@ func TestNextIllegalBom(t *testing.T) {
 		t.Errorf("bad col after next(): got %v, expected %v", lexer.col, 2)
 	}
 }
+
+// test cases for tokens
+
+var tokens = []*token.Token{
+	// Special tokens
+	{Type: token.COMMENT, Content: "// a comment \n"},
+	{Type: token.COMMENT, Content: "//\r\n"},
+	{Type: token.COMMENT, Content: "/* a comment */"},
+	{Type: token.COMMENT, Content: "/* a multi-line comment\n a comment \n*/"},
+	{Type: token.COMMENT, Content: "/*\r*/"},
+
+	// EOF
+	{Type: token.EOF, Content: ""},
+}
+
+const whitespaces = " \t \n\n\r\n"
+
+var source = func() []byte {
+	var src []byte
+	for _, t := range tokens {
+		src = append(src, t.Content...)
+		src = append(src, whitespaces...)
+	}
+	return src
+}()
+
+func newlineCount(s string) int {
+	n := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			n++
+		}
+	}
+	return n
+}
+
+func checkPos(t *testing.T, content string, p token.Position, expected token.Position) {
+	if p.Filename != expected.Filename {
+		t.Errorf("bad filename for %q: got %s, expected %s", content, p.Filename, expected.Filename)
+	}
+	if p.Line != expected.Line {
+		t.Errorf("bad line for %q: got %d, expected %d", content, p.Line, expected.Line)
+	}
+	if p.Column != expected.Column {
+		t.Errorf("bad column for %q: got %d, expected %d", content, p.Column, expected.Column)
+	}
+}
+
+func TestNextToken(t *testing.T) {
+	whitespacesLinecount := newlineCount(whitespaces)
+
+	filename := "test_file.liza"
+	errHandler := func(pos token.Position, msg string) {
+		t.Errorf("error handler called (msg = %s", msg)
+	}
+
+	lexer := New(filename, source, errHandler, ScanComments)
+
+	epos := token.Position{
+		Filename: filename,
+		Line:     1,
+		Column:   1,
+	}
+
+	for _, etk := range tokens {
+		tk := lexer.NextToken()
+
+		// check token type
+		if tk.Type != etk.Type {
+			t.Errorf("bad token for %q: got %s, expected %s", tk.Content, tk.Type, etk.Type)
+		}
+
+		// check token position
+		if tk.Type == token.EOF {
+			// correct for EOF: it is last line plus 1
+			epos.Line = newlineCount(string(source)) + 1
+		}
+		checkPos(t, tk.Content, tk.Position, epos)
+
+		// check content
+		var eContent string
+		switch etk.Type {
+		case token.COMMENT:
+			// no CRs in comments
+			eContent = string(lexer.stripCR([]byte(etk.Content)))
+			//-style comment doesn't content newline
+			if etk.Content[1] == '/' {
+				eContent = eContent[0 : len(eContent)-1]
+			}
+		default:
+			eContent = etk.Content
+		}
+
+		if tk.Content != eContent {
+			t.Errorf("bad content for %q: got %q, expected %q", tk.Content, tk.Content, eContent)
+		}
+
+		// update position for next token
+		epos.Line += newlineCount(etk.Content) + whitespacesLinecount
+	}
+}
