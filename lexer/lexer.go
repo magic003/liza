@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"unicode"
 	"unicode/utf8"
 
 	"github.com/magic003/liza/token"
@@ -221,6 +222,11 @@ func (l *Lexer) stripCR(src []byte) []byte {
 		}
 	}
 	return res[:i]
+}
+
+func (l *Lexer) isLetter(ch rune) bool {
+	return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_' ||
+		(ch >= utf8.RuneSelf && unicode.IsLetter(ch))
 }
 
 func (l *Lexer) skipWhitespace() {

@@ -313,6 +313,39 @@ func TestNextIllegalBom(t *testing.T) {
 	}
 }
 
+func TestIsLetter(t *testing.T) {
+	filename := "test_file.liza"
+	src := []byte("")
+
+	lexer := New(filename, src, nil, 0)
+
+	if !lexer.isLetter('a') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('a'), true)
+	}
+	if !lexer.isLetter('z') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('z'), true)
+	}
+	if !lexer.isLetter('A') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('A'), true)
+	}
+	if !lexer.isLetter('Z') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('Z'), true)
+	}
+	if !lexer.isLetter('_') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('_'), true)
+	}
+	if !lexer.isLetter('ŝ') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('ŝ'), true)
+	}
+
+	if lexer.isLetter('1') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('1'), false)
+	}
+	if lexer.isLetter('#') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('#'), false)
+	}
+}
+
 // test cases for tokens
 
 var tokens = []*token.Token{
