@@ -10,12 +10,21 @@ import (
 // the handler is called with a position and message.
 type ErrorHandler func(pos token.Position, msg string)
 
+// Mode defines the lexer scan behavior.
+type Mode uint
+
+const (
+	// ScanComments returns comments as COMMENT tokens
+	ScanComments Mode = 1 << iota
+)
+
 // New returns a new instance of lexer.
-func New(filename string, src []byte, errHandler ErrorHandler) *Lexer {
+func New(filename string, src []byte, errHandler ErrorHandler, mode Mode) *Lexer {
 	lexer := &Lexer{
 		filename:      filename,
 		src:           src,
 		errHandler:    errHandler,
+		mode:          mode,
 		offset:        0,
 		rdOffset:      0,
 		line:          1,
@@ -38,6 +47,7 @@ type Lexer struct {
 	filename   string
 	src        []byte // source code
 	errHandler ErrorHandler
+	mode       Mode
 
 	// lexing state
 	ch       rune // current character, -1 means end-of-file
@@ -62,6 +72,28 @@ func (l *Lexer) NextToken() *token.Token {
 		// only reach here if ignoreNewline was false and exited from skipWhitespace()
 		l.ignoreNewline = true
 		return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+	case '/':
+		l.next()
+		if l.ch == '/' || l.ch == '*' { // comment
+			offset := l.offset
+			// if any newline is found in the comments, it should be treated as a NEWLINE token and returned first
+			if !l.ignoreNewline && l.findNewlineInComments() {
+				// reset position to the beginning of comment
+				l.ch = '/'
+				l.offset = offset - 1
+				l.rdOffset = offset
+				l.ignoreNewline = true
+				return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+			}
+			comment := l.scanComment()
+			if l.mode&ScanComments == 0 {
+				// skip comment and return next token
+				l.ignoreNewline = true
+				return l.NextToken()
+			}
+			return &token.Token{Type: token.COMMENT, Position: pos, Content: comment}
+		}
+		// TODO handle other case
 	}
 	return nil
 }
@@ -123,8 +155,109 @@ func (l *Lexer) currentPosition() token.Position {
 	}
 }
 
+func (l *Lexer) findNewlineInComments() bool {
+	// initial '/' is already consumed
+
+	defer func(ch rune, offset int, line int, col int) {
+		// reset lexer state
+		l.ch = ch
+		l.offset = offset
+		l.rdOffset = offset
+		l.line = line
+		l.col = col
+	}(l.ch, l.offset, l.line, l.col)
+
+	// read ahead until a newline, EOF, or non-comment token is found
+	for l.ch == '/' || l.ch == '*' {
+		if l.ch == '/' {
+			//-style comment always contains a newline
+			return true
+		}
+
+		/*-style comment: look for newline */
+		l.next()
+		for l.ch >= 0 {
+			ch := l.ch
+			if ch == '\n' {
+				return true
+			}
+			l.next()
+			if ch == '*' && l.ch == '/' {
+				// if end of /*-style comment is found, continue searching
+				l.next()
+				break
+			}
+		}
+		l.skipWhitespace()            // l.ignoreNewline is false
+		if l.ch < 0 || l.ch == '\n' { // EOF or newline
+			return true
+		}
+		if l.ch != '/' {
+			// non-comment token
+			return false
+		}
+		l.next() // consume '/'
+	}
+
+	// non-comment token
+	return false
+}
+
+func (l *Lexer) stripCR(src []byte) []byte {
+	res := make([]byte, len(src))
+	i := 0
+	for _, ch := range src {
+		if ch != '\r' {
+			res[i] = ch
+			i++
+		}
+	}
+	return res[:i]
+}
+
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || (l.ch == '\n' && l.ignoreNewline) || l.ch == '\r' {
 		l.next()
 	}
+}
+
+func (l *Lexer) scanComment() string {
+	// initial '/' is already consumed; l.ch == '/' || l.ch == '*'
+	offset := l.offset - 1
+	hasCR := false
+
+	if l.ch == '/' { //-style comment
+		for l.ch != '\n' && l.ch >= 0 {
+			if l.ch == '\r' {
+				hasCR = true
+			}
+			l.next()
+		}
+
+		goto exit
+	}
+
+	/*-style comment */
+	l.next()
+	for l.ch >= 0 {
+		ch := l.ch
+		if ch == '\r' {
+			hasCR = true
+		}
+		l.next()
+		if ch == '*' && l.ch == '/' {
+			l.next()
+			goto exit
+		}
+	}
+
+	// reach here means the comment is not terminated
+	l.error(l.line, l.col, "comment not terminated")
+
+exit:
+	comment := l.src[offset:l.offset]
+	if hasCR {
+		comment = l.stripCR(comment)
+	}
+	return string(comment)
 }

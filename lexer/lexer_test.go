@@ -13,7 +13,7 @@ func TestNew(t *testing.T) {
 	src := []byte("\uFEFFsource code for testing")
 	errHandler := func(pos token.Position, msg string) {}
 
-	lexer := New(filename, src, errHandler)
+	lexer := New(filename, src, errHandler, ScanComments)
 	if lexer == nil {
 		t.Error("new lexer should not be nil")
 	}
@@ -26,6 +26,9 @@ func TestNew(t *testing.T) {
 	}
 	if lexer.errHandler == nil {
 		t.Error("errHandler should not be nil")
+	}
+	if lexer.mode != ScanComments {
+		t.Errorf("bad mode for lexer: got %v, expected %v", lexer.mode, ScanComments)
 	}
 	if lexer.ch != 's' { // BOM should be ignored
 		t.Errorf("bad ch for lexer: got %c, expected %c", lexer.ch, 's')
@@ -52,7 +55,7 @@ func TestNextAscii(t *testing.T) {
 	filename := "test_file.liza"
 	src := []byte("ab")
 
-	lexer := New(filename, src, nil)
+	lexer := New(filename, src, nil, 0)
 
 	if lexer.ch != 'a' {
 		t.Errorf("bad ch after next(): got %c, expected %c", lexer.ch, 'a')
@@ -92,7 +95,7 @@ func TestNextNonAscii(t *testing.T) {
 	filename := "test_file.liza"
 	src := []byte("测试")
 
-	lexer := New(filename, src, nil)
+	lexer := New(filename, src, nil, 0)
 
 	if lexer.ch != '测' {
 		t.Errorf("bad ch after next(): got %c, expected %c", lexer.ch, '测')
@@ -132,7 +135,7 @@ func TestNextEmptyFile(t *testing.T) {
 	filename := "empty.liza"
 	var src []byte
 
-	lexer := New(filename, src, nil)
+	lexer := New(filename, src, nil, 0)
 	if lexer.ch != -1 {
 		t.Errorf("bad ch after next(): got %c, expected %c", lexer.ch, -1)
 	}
@@ -145,7 +148,7 @@ func TestNextEof(t *testing.T) {
 	filename := "test.liza"
 	src := []byte("ab")
 
-	lexer := New(filename, src, nil)
+	lexer := New(filename, src, nil, 0)
 	lexer.next()
 	lexer.next()
 
@@ -161,7 +164,7 @@ func TestNextNewLine(t *testing.T) {
 	filename := "test.liza"
 	src := []byte("a\nb\nc")
 
-	lexer := New(filename, src, nil)
+	lexer := New(filename, src, nil, 0)
 	lexer.next()
 	lexer.next()
 
@@ -193,7 +196,7 @@ func TestNextIllegalNull(t *testing.T) {
 		errMsg = msg
 	}
 
-	lexer := New(filename, src, errHandler)
+	lexer := New(filename, src, errHandler, 0)
 
 	if errPos.Filename != filename {
 		t.Errorf("bad filename in error handler: got %s, expected %s", errPos.Filename, filename)
@@ -235,7 +238,7 @@ func TestNextIllegalUtf8Encoding(t *testing.T) {
 		errMsg = msg
 	}
 
-	lexer := New(filename, src, errHandler)
+	lexer := New(filename, src, errHandler, 0)
 
 	if errPos.Filename != filename {
 		t.Errorf("bad filename in error handler: got %s, expected %s", errPos.Filename, filename)
@@ -277,7 +280,7 @@ func TestNextIllegalBom(t *testing.T) {
 		errMsg = msg
 	}
 
-	lexer := New(filename, src, errHandler)
+	lexer := New(filename, src, errHandler, 0)
 	lexer.next()
 
 	if errPos.Filename != filename {
