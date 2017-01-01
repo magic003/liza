@@ -67,6 +67,13 @@ func (l *Lexer) NextToken() *token.Token {
 
 	ch := l.ch
 	switch ch {
+	case -1:
+		if !l.ignoreNewline {
+			l.ignoreNewline = true
+			return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+		}
+
+		return &token.Token{Type: token.EOF, Position: pos, Content: ""}
 	case '\n':
 		l.next()
 		// only reach here if ignoreNewline was false and exited from skipWhitespace()
