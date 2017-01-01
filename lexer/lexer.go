@@ -66,42 +66,51 @@ func (l *Lexer) NextToken() *token.Token {
 
 	pos := l.currentPosition()
 
-	ch := l.ch
-	switch ch {
-	case -1:
-		if !l.ignoreNewline {
-			l.ignoreNewline = true
-			return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+	switch ch := l.ch; {
+	case l.isLetter(ch):
+		content := l.scanIdentifier()
+		ty := token.LookupKeyword(content)
+		if ty == token.IDENT || ty == token.BREAK || ty == token.CONTINUE || ty == token.RETURN {
+			l.ignoreNewline = false
 		}
-
-		return &token.Token{Type: token.EOF, Position: pos, Content: ""}
-	case '\n':
-		l.next()
-		// only reach here if ignoreNewline was false and exited from skipWhitespace()
-		l.ignoreNewline = true
-		return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
-	case '/':
-		l.next()
-		if l.ch == '/' || l.ch == '*' { // comment
-			offset := l.offset
-			// if any newline is found in the comments, it should be treated as a NEWLINE token and returned first
-			if !l.ignoreNewline && l.findNewlineInComments() {
-				// reset position to the beginning of comment
-				l.ch = '/'
-				l.offset = offset - 1
-				l.rdOffset = offset
+		return &token.Token{Type: ty, Position: pos, Content: content}
+	default:
+		switch ch {
+		case -1:
+			if !l.ignoreNewline {
 				l.ignoreNewline = true
 				return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
 			}
-			comment := l.scanComment()
-			if l.mode&ScanComments == 0 {
-				// skip comment and return next token
-				l.ignoreNewline = true
-				return l.NextToken()
+
+			return &token.Token{Type: token.EOF, Position: pos, Content: ""}
+		case '\n':
+			l.next()
+			// only reach here if ignoreNewline was false and exited from skipWhitespace()
+			l.ignoreNewline = true
+			return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+		case '/':
+			l.next()
+			if l.ch == '/' || l.ch == '*' { // comment
+				offset := l.offset
+				// if any newline is found in the comments, it should be treated as a NEWLINE token and returned first
+				if !l.ignoreNewline && l.findNewlineInComments() {
+					// reset position to the beginning of comment
+					l.ch = '/'
+					l.offset = offset - 1
+					l.rdOffset = offset
+					l.ignoreNewline = true
+					return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
+				}
+				comment := l.scanComment()
+				if l.mode&ScanComments == 0 {
+					// skip comment and return next token
+					l.ignoreNewline = true
+					return l.NextToken()
+				}
+				return &token.Token{Type: token.COMMENT, Position: pos, Content: comment}
 			}
-			return &token.Token{Type: token.COMMENT, Position: pos, Content: comment}
+			// TODO handle other case
 		}
-		// TODO handle other case
 	}
 	return nil
 }
@@ -229,6 +238,10 @@ func (l *Lexer) isLetter(ch rune) bool {
 		(ch >= utf8.RuneSelf && unicode.IsLetter(ch))
 }
 
+func (l *Lexer) isDigit(ch rune) bool {
+	return ('0' <= ch && ch <= '9') || (ch >= utf8.RuneSelf && unicode.IsDigit(ch))
+}
+
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || (l.ch == '\n' && l.ignoreNewline) || l.ch == '\r' {
 		l.next()
@@ -274,4 +287,12 @@ exit:
 		comment = l.stripCR(comment)
 	}
 	return string(comment)
+}
+
+func (l *Lexer) scanIdentifier() string {
+	offset := l.offset
+	for l.isLetter(l.ch) || l.isDigit(l.ch) {
+		l.next()
+	}
+	return string(l.src[offset:l.offset])
 }

@@ -341,8 +341,38 @@ func TestIsLetter(t *testing.T) {
 	if lexer.isLetter('1') {
 		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('1'), false)
 	}
+	if lexer.isLetter('６') {
+		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('６'), false)
+	}
 	if lexer.isLetter('#') {
 		t.Errorf("bad result for isLetter(): got %v, expected %v", lexer.isLetter('#'), false)
+	}
+}
+
+func TestIsDigit(t *testing.T) {
+	filename := "test_file.liza"
+	src := []byte("")
+
+	lexer := New(filename, src, nil, 0)
+
+	if !lexer.isDigit('0') {
+		t.Errorf("bad result for isDigit(): got %v, expected %v", lexer.isDigit('0'), true)
+	}
+	if !lexer.isDigit('9') {
+		t.Errorf("bad result for isDigit(): got %v, expected %v", lexer.isDigit('9'), true)
+	}
+	if !lexer.isDigit('６') {
+		t.Errorf("bad result for isDigit(): got %v, expected %v", lexer.isDigit('６'), true)
+	}
+
+	if lexer.isDigit('a') {
+		t.Errorf("bad result for isDigit(): got %v, expected %v", lexer.isDigit('a'), false)
+	}
+	if lexer.isDigit('#') {
+		t.Errorf("bad result for isDigit(): got %v, expected %v", lexer.isDigit('#'), false)
+	}
+	if lexer.isDigit('ŝ') {
+		t.Errorf("bad result for isDigit(): got %v, expected %v", lexer.isDigit('ŝ'), false)
 	}
 }
 
@@ -355,6 +385,41 @@ var tokens = []*token.Token{
 	{Type: token.COMMENT, Content: "/* a comment */"},
 	{Type: token.COMMENT, Content: "/* a multi-line comment\n a comment \n*/"},
 	{Type: token.COMMENT, Content: "/*\r*/"},
+
+	// Identifiers
+	{Type: token.IDENT, Content: "foobar"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.IDENT, Content: "a۰۱۸"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.IDENT, Content: "foo६४"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.IDENT, Content: "bar９８７６"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.IDENT, Content: "ŝ"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.IDENT, Content: "ŝfoo"},
+	{Type: token.NEWLINE, Content: "\n"},
+
+	// Keywords
+	{Type: token.BREAK, Content: "break"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.CLASS, Content: "class"},
+	{Type: token.CONST, Content: "const"},
+	{Type: token.CONTINUE, Content: "continue"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.ELSE, Content: "else"},
+	{Type: token.ENUM, Content: "enum"},
+	{Type: token.FOR, Content: "for"},
+	{Type: token.FUN, Content: "fun"},
+	{Type: token.IF, Content: "if"},
+	{Type: token.IMPLEMENTS, Content: "implements"},
+	{Type: token.IMPORT, Content: "import"},
+	{Type: token.INTERFACE, Content: "interface"},
+	{Type: token.MATCH, Content: "match"},
+	{Type: token.PACKAGE, Content: "package"},
+	{Type: token.PUBLIC, Content: "public"},
+	{Type: token.RETURN, Content: "return"},
+	{Type: token.NEWLINE, Content: "\n"},
 
 	// EOF
 	{Type: token.EOF, Content: ""},
@@ -379,6 +444,18 @@ func newlineCount(s string) int {
 		}
 	}
 	return n
+}
+
+func firstNewlineColumn(s string) int {
+	n := 0
+	for _, runeValue := range s {
+		n++
+		if runeValue == '\n' {
+			return n
+		}
+	}
+	// should never happen
+	return -1
 }
 
 func checkPos(t *testing.T, content string, p token.Position, expected token.Position) {
@@ -409,7 +486,7 @@ func TestNextToken(t *testing.T) {
 		Column:   1,
 	}
 
-	for _, etk := range tokens {
+	for i, etk := range tokens {
 		tk := lexer.NextToken()
 
 		// check token type
@@ -418,11 +495,20 @@ func TestNextToken(t *testing.T) {
 		}
 
 		// check token position
-		if tk.Type == token.EOF {
-			// correct for EOF: it is last line plus 1
-			epos.Line = newlineCount(string(source)) + 1
+		if tk.Type == token.NEWLINE {
+			// NEWLINE is actually in last token or the appended whitespaces
+			pos := epos
+			pos.Line -= whitespacesLinecount
+			pos.Column = firstNewlineColumn(tokens[i-1].Content + whitespaces)
+
+			checkPos(t, tk.Content, tk.Position, pos)
+		} else {
+			if tk.Type == token.EOF {
+				// correct for EOF: it is last line plus 1
+				epos.Line = newlineCount(string(source)) + 1
+			}
+			checkPos(t, tk.Content, tk.Position, epos)
 		}
-		checkPos(t, tk.Content, tk.Position, epos)
 
 		// check content
 		var eContent string
