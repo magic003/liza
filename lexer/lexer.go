@@ -79,6 +79,7 @@ func (l *Lexer) NextToken() *token.Token {
 		ty, content := l.scanNumber(false)
 		return &token.Token{Type: ty, Position: pos, Content: content}
 	default:
+		l.next()
 		switch ch {
 		case -1:
 			if !l.ignoreNewline {
@@ -88,12 +89,10 @@ func (l *Lexer) NextToken() *token.Token {
 
 			return &token.Token{Type: token.EOF, Position: pos, Content: ""}
 		case '\n':
-			l.next()
 			// only reach here if ignoreNewline was false and exited from skipWhitespace()
 			l.ignoreNewline = true
 			return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
 		case '/':
-			l.next()
 			if l.ch == '/' || l.ch == '*' { // comment
 				offset := l.offset
 				// if any newline is found in the comments, it should be treated as a NEWLINE token and returned first
@@ -115,7 +114,6 @@ func (l *Lexer) NextToken() *token.Token {
 			}
 			// TODO handle other case
 		case '.':
-			l.next()
 			if '0' <= l.ch && l.ch <= '9' {
 				l.ignoreNewline = false
 				ty, content := l.scanNumber(true)
