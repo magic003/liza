@@ -135,6 +135,15 @@ func (l *Lexer) NextToken() *token.Token {
 				l.ignoreNewline = false
 			}
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case '-':
+			ty := l.switch3(token.SUB, token.SUBASSIGN, '-', token.DEC)
+			if ty == token.DEC {
+				l.ignoreNewline = false
+			}
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case '*':
+			ty := l.switch2(token.MUL, token.MULASSIGN)
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		}
 	}
 
@@ -528,6 +537,14 @@ func (l *Lexer) scanRawString() string {
 	}
 
 	return string(str)
+}
+
+func (l *Lexer) switch2(ty0 token.Type, ty1 token.Type) token.Type {
+	if l.ch == '=' {
+		l.next()
+		return ty1
+	}
+	return ty0
 }
 
 func (l *Lexer) switch3(ty0 token.Type, ty1 token.Type, ch2 rune, ty2 token.Type) token.Type {

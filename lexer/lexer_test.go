@@ -457,10 +457,16 @@ var tokens = []*token.Token{
 
 	// Operators and delimiters
 	{Type: token.ADD, Content: "+"},
+	{Type: token.SUB, Content: "-"},
+	{Type: token.MUL, Content: "*"},
 
 	{Type: token.ADDASSIGN, Content: "+="},
+	{Type: token.SUBASSIGN, Content: "-="},
+	{Type: token.MULASSIGN, Content: "*="},
 
 	{Type: token.INC, Content: "++"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.DEC, Content: "--"},
 	{Type: token.NEWLINE, Content: "\n"},
 
 	// Keywords
