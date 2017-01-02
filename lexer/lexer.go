@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"unicode"
 	"unicode/utf8"
 
@@ -119,6 +120,14 @@ func (l *Lexer) NextToken() *token.Token {
 				ty, content := l.scanNumber(true)
 				return &token.Token{Type: ty, Position: pos, Content: content}
 			}
+		case '"':
+			l.ignoreNewline = false
+			content := l.scanString()
+			return &token.Token{Type: token.STRING, Position: pos, Content: content}
+		case '`':
+			l.ignoreNewline = false
+			content := l.scanRawString()
+			return &token.Token{Type: token.STRING, Position: pos, Content: content}
 		}
 	}
 
@@ -405,4 +414,111 @@ exponent:
 
 exit:
 	return ty, string(l.src[offset:l.offset])
+}
+
+func (l *Lexer) scanEscape(quote rune) bool {
+	line := l.line
+	col := l.col
+
+	var n, base, max uint32
+	switch l.ch {
+	case 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', quote:
+		l.next()
+		return true
+	case '0', '1', '2', '3', '4', '5', '6', '7':
+		n, base, max = 3, 8, 255
+	case 'x':
+		l.next()
+		n, base, max = 2, 16, 255
+	case 'u':
+		l.next()
+		n, base, max = 4, 16, unicode.MaxRune
+	case 'U':
+		l.next()
+		n, base, max = 8, 16, unicode.MaxRune
+	default:
+		msg := "unknown escape sequence"
+		if l.ch < 0 {
+			msg = "escape sequence not terminated"
+		}
+		l.error(line, col, msg)
+		return false
+	}
+
+	var x uint32
+	for n > 0 {
+		d := uint32(l.digitValue(l.ch))
+		if d > base {
+			msg := fmt.Sprintf("illegal character %#U in escape sequence", l.ch)
+			if l.ch < 0 {
+				msg = "escape sequence not terminated"
+			}
+			l.error(line, col, msg)
+			return false
+		}
+		x = x*base + d
+		l.next()
+		n--
+	}
+
+	if x > max || (0xD800 <= x && x < 0xE000) {
+		l.error(line, col, "escape sequence is invalid Unicode code point")
+		return false
+	}
+
+	return true
+}
+
+func (l *Lexer) scanString() string {
+	// '"' is already consumed
+	offset := l.offset - 1
+	line := l.line
+	col := l.col
+
+	for {
+		ch := l.ch
+		if ch == '\n' || ch < 0 {
+			l.error(line, col, "string literal not terminated")
+			break
+		}
+		l.next()
+		if ch == '"' {
+			break
+		}
+		if ch == '\\' {
+			l.scanEscape('"')
+		}
+	}
+
+	return string(l.src[offset:l.offset])
+}
+
+func (l *Lexer) scanRawString() string {
+	// '`' is already consumed
+	offset := l.offset - 1
+	line := l.line
+	col := l.col
+
+	hasCR := false
+	for {
+		ch := l.ch
+		if ch < 0 {
+			l.error(line, col, "raw string literal not terminated")
+			break
+		}
+		l.next()
+		if ch == '`' {
+			break
+		}
+		if ch == '\r' {
+			hasCR = true
+		}
+	}
+
+	str := l.src[offset:l.offset]
+	if hasCR {
+		str = l.stripCR(str)
+	}
+
+	return string(str)
 }

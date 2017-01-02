@@ -417,6 +417,7 @@ var tokens = []*token.Token{
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.INT, Content: "0Xcafebabe"},
 	{Type: token.NEWLINE, Content: "\n"},
+
 	{Type: token.FLOAT, Content: "0."},
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.FLOAT, Content: ".0"},
@@ -430,6 +431,28 @@ var tokens = []*token.Token{
 	{Type: token.FLOAT, Content: "1e-100"},
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.FLOAT, Content: "2.71828e-1000"},
+	{Type: token.NEWLINE, Content: "\n"},
+
+	{Type: token.STRING, Content: "`foobar`"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: `"foobar"`},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: "`" + `foo
+							                        bar` +
+		"`",
+	},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: "`\r`"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: "`foo\r\nbar`"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: `"\\000foo"`},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: `"\xFFbar"`},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: `"\uff16foo"`},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.STRING, Content: `"\U0000ff16bar"`},
 	{Type: token.NEWLINE, Content: "\n"},
 
 	// Keywords
@@ -490,6 +513,18 @@ func firstNewlineColumn(s string) int {
 	return -1
 }
 
+func lengthOfLastLine(s string) int {
+	runes := []rune(s)
+	len := len(runes)
+	for i := len - 1; i >= 0; i-- {
+		if runes[i] == '\n' {
+			return len - 1 - i
+		}
+	}
+
+	return len
+}
+
 func checkPos(t *testing.T, content string, p token.Position, expected token.Position) {
 	if p.Filename != expected.Filename {
 		t.Errorf("bad filename for %q: got %s, expected %s", content, p.Filename, expected.Filename)
@@ -504,6 +539,7 @@ func checkPos(t *testing.T, content string, p token.Position, expected token.Pos
 
 func TestNextToken(t *testing.T) {
 	whitespacesLinecount := newlineCount(whitespaces)
+	whitespacesFirstNewlineCol := firstNewlineColumn(whitespaces)
 
 	filename := "test_file.liza"
 	errHandler := func(pos token.Position, msg string) {
@@ -531,7 +567,7 @@ func TestNextToken(t *testing.T) {
 			// NEWLINE is actually in last token or the appended whitespaces
 			pos := epos
 			pos.Line -= whitespacesLinecount
-			pos.Column = firstNewlineColumn(tokens[i-1].Content + whitespaces)
+			pos.Column = lengthOfLastLine(tokens[i-1].Content) + whitespacesFirstNewlineCol
 
 			checkPos(t, tk.Content, tk.Position, pos)
 		} else {
@@ -543,7 +579,7 @@ func TestNextToken(t *testing.T) {
 		}
 
 		// check content
-		var eContent string
+		eContent := etk.Content
 		switch etk.Type {
 		case token.COMMENT:
 			// no CRs in comments
@@ -552,8 +588,11 @@ func TestNextToken(t *testing.T) {
 			if etk.Content[1] == '/' {
 				eContent = eContent[0 : len(eContent)-1]
 			}
-		default:
-			eContent = etk.Content
+		case token.STRING:
+			// no CRs in raw string literals
+			if eContent[0] == '`' {
+				eContent = string(lexer.stripCR([]byte(eContent)))
+			}
 		}
 
 		if tk.Content != eContent {
