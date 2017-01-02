@@ -455,6 +455,14 @@ var tokens = []*token.Token{
 	{Type: token.STRING, Content: `"\U0000ff16bar"`},
 	{Type: token.NEWLINE, Content: "\n"},
 
+	// Operators and delimiters
+	{Type: token.ADD, Content: "+"},
+
+	{Type: token.ADDASSIGN, Content: "+="},
+
+	{Type: token.INC, Content: "++"},
+	{Type: token.NEWLINE, Content: "\n"},
+
 	// Keywords
 	{Type: token.BREAK, Content: "break"},
 	{Type: token.NEWLINE, Content: "\n"},
