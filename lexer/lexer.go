@@ -74,6 +74,10 @@ func (l *Lexer) NextToken() *token.Token {
 			l.ignoreNewline = false
 		}
 		return &token.Token{Type: ty, Position: pos, Content: content}
+	case '0' <= ch && ch <= '9':
+		l.ignoreNewline = false
+		ty, content := l.scanNumber(false)
+		return &token.Token{Type: ty, Position: pos, Content: content}
 	default:
 		switch ch {
 		case -1:
@@ -110,8 +114,16 @@ func (l *Lexer) NextToken() *token.Token {
 				return &token.Token{Type: token.COMMENT, Position: pos, Content: comment}
 			}
 			// TODO handle other case
+		case '.':
+			l.next()
+			if '0' <= l.ch && l.ch <= '9' {
+				l.ignoreNewline = false
+				ty, content := l.scanNumber(true)
+				return &token.Token{Type: ty, Position: pos, Content: content}
+			}
 		}
 	}
+
 	return nil
 }
 
@@ -295,4 +307,104 @@ func (l *Lexer) scanIdentifier() string {
 		l.next()
 	}
 	return string(l.src[offset:l.offset])
+}
+
+func (l *Lexer) digitValue(ch rune) int {
+	switch {
+	case '0' <= ch && ch <= '9':
+		return int(ch - '0')
+	case 'a' <= ch && ch <= 'z':
+		return int(ch - 'a' + 10)
+	case 'A' <= ch && ch <= 'Z':
+		return int(ch - 'A' + 10)
+	}
+	return 16 // larger than any legal digit val
+}
+
+func (l *Lexer) scanMantissa(base int) {
+	for l.digitValue(l.ch) < base {
+		l.next()
+	}
+}
+
+func (l *Lexer) scanNumber(seenDecimalPoint bool) (token.Type, string) {
+	offset := l.offset
+	line := l.line
+	col := l.col
+	ty := token.INT
+
+	if seenDecimalPoint {
+		offset--
+		ty = token.FLOAT
+		l.scanMantissa(10)
+		goto exponent
+	}
+
+	if l.ch == '0' {
+		// int or float
+		line := l.line
+		col := l.col
+		l.next()
+		if l.ch == 'x' || l.ch == 'X' {
+			// hexadecimal int
+			l.next()
+			l.scanMantissa(16)
+			if l.offset-offset <= 2 {
+				// only scanned "0x" or "0X"
+				l.error(line, col, "illegal hexadecimal number")
+			}
+		} else if l.ch == 'b' || l.ch == 'B' {
+			// binary int
+			l.next()
+			l.scanMantissa(2)
+			if l.offset-offset <= 2 {
+				// only scanned "0b" or "0B"
+				l.error(line, col, "illegal binary number")
+			}
+		} else {
+			// octal int or float
+			seenDecimalDigit := false
+			l.scanMantissa(8)
+			if l.ch == '8' || l.ch == '9' {
+				// illegal octal int or float
+				seenDecimalDigit = true
+				l.scanMantissa(10)
+			}
+			if l.ch == '.' || l.ch == 'e' || l.ch == 'E' {
+				goto fraction
+			}
+			// octal int
+			if seenDecimalDigit {
+				l.error(line, col, "illegal octal number")
+			}
+		}
+		goto exit
+	}
+
+	// decimal int or float
+	l.scanMantissa(10)
+
+fraction:
+	if l.ch == '.' {
+		ty = token.FLOAT
+		l.next()
+		l.scanMantissa(10)
+	}
+
+exponent:
+	if l.ch == 'e' || l.ch == 'E' {
+		ty = token.FLOAT
+		l.next()
+		if l.ch == '-' || l.ch == '+' {
+			l.next()
+		}
+		if l.digitValue(l.ch) < 10 {
+			l.scanMantissa(10)
+		} else {
+			l.error(line, col, "illegal floating-point exponent")
+		}
+	}
+
+exit:
+	return ty, string(l.src[offset:l.offset])
 }
