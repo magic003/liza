@@ -176,6 +176,7 @@ func (l *Lexer) NextToken() *token.Token {
 				l.next()
 				return &token.Token{Type: token.DEFINE, Position: pos, Content: string(l.src[startOffset:l.offset])}
 			}
+			// unexpected character, will return error later
 		case '(':
 			return &token.Token{Type: token.LPAREN, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case ')':
@@ -196,8 +197,11 @@ func (l *Lexer) NextToken() *token.Token {
 		}
 	}
 
-	l.error(l.line, l.col, fmt.Sprintf("illegal character %#U", ch))
-	return &token.Token{Type: token.ILLEGAL, Position: pos, Content: string(l.src[startOffset:l.offset])}
+	// unexpected bom is already reported in next(), don't repeat it here
+	if ch == bom {
+		l.error(l.line, l.col, fmt.Sprintf("illegal character %#U", ch))
+	}
+	return &token.Token{Type: token.ILLEGAL, Position: pos, Content: string(ch)}
 }
 
 const bom = 0xFEFF // byte order mark, only permitted as very first character
