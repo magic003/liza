@@ -459,10 +459,12 @@ var tokens = []*token.Token{
 	{Type: token.ADD, Content: "+"},
 	{Type: token.SUB, Content: "-"},
 	{Type: token.MUL, Content: "*"},
+	{Type: token.DIV, Content: "/"},
 
 	{Type: token.ADDASSIGN, Content: "+="},
 	{Type: token.SUBASSIGN, Content: "-="},
 	{Type: token.MULASSIGN, Content: "*="},
+	{Type: token.DIVASSIGN, Content: "/="},
 
 	{Type: token.INC, Content: "++"},
 	{Type: token.NEWLINE, Content: "\n"},

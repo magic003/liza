@@ -114,7 +114,8 @@ func (l *Lexer) NextToken() *token.Token {
 				}
 				return &token.Token{Type: token.COMMENT, Position: pos, Content: comment}
 			}
-			// TODO handle other case
+			ty := l.switch2(token.DIV, token.DIVASSIGN)
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '.':
 			if '0' <= l.ch && l.ch <= '9' {
 				l.ignoreNewline = false
