@@ -462,12 +462,17 @@ var tokens = []*token.Token{
 	{Type: token.DIV, Content: "/"},
 	{Type: token.REM, Content: "%"},
 
+	{Type: token.AND, Content: "&"},
+
 	{Type: token.ADDASSIGN, Content: "+="},
 	{Type: token.SUBASSIGN, Content: "-="},
 	{Type: token.MULASSIGN, Content: "*="},
 	{Type: token.DIVASSIGN, Content: "/="},
 	{Type: token.REMASSIGN, Content: "%="},
 
+	{Type: token.ANDASSIGN, Content: "&="},
+
+	{Type: token.LAND, Content: "&&"},
 	{Type: token.INC, Content: "++"},
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.DEC, Content: "--"},
