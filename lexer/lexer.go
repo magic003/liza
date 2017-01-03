@@ -154,6 +154,9 @@ func (l *Lexer) NextToken() *token.Token {
 		case '|':
 			ty := l.switch3(token.OR, token.ORASSIGN, '|', token.LOR)
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case '^':
+			ty := l.switch2(token.XOR, token.XORASSIGN)
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		}
 	}
 
