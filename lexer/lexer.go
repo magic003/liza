@@ -123,6 +123,7 @@ func (l *Lexer) NextToken() *token.Token {
 				ty, content := l.scanNumber(true)
 				return &token.Token{Type: ty, Position: pos, Content: content}
 			}
+			return &token.Token{Type: token.PERIOD, Position: pos, Content: "."}
 		case '"':
 			l.ignoreNewline = false
 			content := l.scanString()
