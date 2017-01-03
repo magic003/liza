@@ -496,6 +496,7 @@ var tokens = []*token.Token{
 	{Type: token.NEQ, Content: "!="},
 	{Type: token.LEQ, Content: "<="},
 	{Type: token.GEQ, Content: ">="},
+	{Type: token.DEFINE, Content: ":="},
 
 	// Keywords
 	{Type: token.BREAK, Content: "break"},

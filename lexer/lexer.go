@@ -68,7 +68,8 @@ func (l *Lexer) NextToken() *token.Token {
 	pos := l.currentPosition()
 	startOffset := l.offset
 
-	switch ch := l.ch; {
+	ch := l.ch
+	switch {
 	case l.isLetter(ch):
 		content := l.scanIdentifier()
 		ty := token.LookupKeyword(content)
@@ -169,10 +170,16 @@ func (l *Lexer) NextToken() *token.Token {
 		case '!':
 			ty := l.switch2(token.NOT, token.NEQ)
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case ':':
+			if l.ch == '=' {
+				l.next()
+				return &token.Token{Type: token.DEFINE, Position: pos, Content: string(l.src[startOffset:l.offset])}
+			}
 		}
 	}
 
-	return nil
+	l.error(l.line, l.col, fmt.Sprintf("illegal character %#U", ch))
+	return &token.Token{Type: token.ILLEGAL, Position: pos, Content: string(l.src[startOffset:l.offset])}
 }
 
 const bom = 0xFEFF // byte order mark, only permitted as very first character
