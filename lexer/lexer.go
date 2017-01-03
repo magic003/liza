@@ -190,6 +190,8 @@ func (l *Lexer) NextToken() *token.Token {
 		case '}':
 			l.ignoreNewline = false
 			return &token.Token{Type: token.RBRACE, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case ',':
+			return &token.Token{Type: token.COMMA, Position: pos, Content: ","}
 		}
 	}
 

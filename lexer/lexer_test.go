@@ -501,6 +501,7 @@ var tokens = []*token.Token{
 	{Type: token.LPAREN, Content: "("},
 	{Type: token.LBRACK, Content: "["},
 	{Type: token.LBRACE, Content: "{"},
+	{Type: token.COMMA, Content: ","},
 
 	{Type: token.RPAREN, Content: ")"},
 	{Type: token.NEWLINE, Content: "\n"},
