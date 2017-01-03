@@ -157,6 +157,9 @@ func (l *Lexer) NextToken() *token.Token {
 		case '^':
 			ty := l.switch2(token.XOR, token.XORASSIGN)
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case '<':
+			ty := l.switch4(token.LSS, token.LEQ, '<', token.SHL, token.SHLASSIGN)
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		}
 	}
 
@@ -567,6 +570,22 @@ func (l *Lexer) switch3(ty0 token.Type, ty1 token.Type, ch2 rune, ty2 token.Type
 	}
 	if l.ch == ch2 {
 		l.next()
+		return ty2
+	}
+	return ty0
+}
+
+func (l *Lexer) switch4(ty0 token.Type, ty1 token.Type, ch2 rune, ty2 token.Type, ty3 token.Type) token.Type {
+	if l.ch == '=' {
+		l.next()
+		return ty1
+	}
+	if l.ch == ch2 {
+		l.next()
+		if l.ch == '=' {
+			l.next()
+			return ty3
+		}
 		return ty2
 	}
 	return ty0
