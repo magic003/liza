@@ -491,7 +491,9 @@ var tokens = []*token.Token{
 	{Type: token.LSS, Content: "<"},
 	{Type: token.GTR, Content: ">"},
 	{Type: token.ASSIGN, Content: "="},
+	{Type: token.NOT, Content: "!"},
 
+	{Type: token.NEQ, Content: "!="},
 	{Type: token.LEQ, Content: "<="},
 	{Type: token.GEQ, Content: ">="},
 

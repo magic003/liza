@@ -166,6 +166,9 @@ func (l *Lexer) NextToken() *token.Token {
 		case '=':
 			ty := l.switch2(token.ASSIGN, token.EQL)
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case '!':
+			ty := l.switch2(token.NOT, token.NEQ)
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		}
 	}
 
