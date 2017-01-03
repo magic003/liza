@@ -463,6 +463,7 @@ var tokens = []*token.Token{
 	{Type: token.REM, Content: "%"},
 
 	{Type: token.AND, Content: "&"},
+	{Type: token.OR, Content: "|"},
 
 	{Type: token.ADDASSIGN, Content: "+="},
 	{Type: token.SUBASSIGN, Content: "-="},
@@ -471,8 +472,10 @@ var tokens = []*token.Token{
 	{Type: token.REMASSIGN, Content: "%="},
 
 	{Type: token.ANDASSIGN, Content: "&="},
+	{Type: token.ORASSIGN, Content: "|="},
 
 	{Type: token.LAND, Content: "&&"},
+	{Type: token.LOR, Content: "||"},
 	{Type: token.INC, Content: "++"},
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.DEC, Content: "--"},
