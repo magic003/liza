@@ -499,8 +499,14 @@ var tokens = []*token.Token{
 	{Type: token.DEFINE, Content: ":="},
 
 	{Type: token.LPAREN, Content: "("},
+	{Type: token.LBRACK, Content: "["},
+	{Type: token.LBRACE, Content: "{"},
 
 	{Type: token.RPAREN, Content: ")"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.RBRACK, Content: "]"},
+	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.RBRACE, Content: "}"},
 	{Type: token.NEWLINE, Content: "\n"},
 
 	// Keywords
