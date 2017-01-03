@@ -487,8 +487,10 @@ var tokens = []*token.Token{
 	{Type: token.DEC, Content: "--"},
 	{Type: token.NEWLINE, Content: "\n"},
 
+	{Type: token.EQL, Content: "=="},
 	{Type: token.LSS, Content: "<"},
 	{Type: token.GTR, Content: ">"},
+	{Type: token.ASSIGN, Content: "="},
 
 	{Type: token.LEQ, Content: "<="},
 	{Type: token.GEQ, Content: ">="},
