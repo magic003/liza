@@ -160,6 +160,9 @@ func (l *Lexer) NextToken() *token.Token {
 		case '<':
 			ty := l.switch4(token.LSS, token.LEQ, '<', token.SHL, token.SHLASSIGN)
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case '>':
+			ty := l.switch4(token.GTR, token.GEQ, '>', token.SHR, token.SHRASSIGN)
+			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		}
 	}
 

@@ -466,6 +466,7 @@ var tokens = []*token.Token{
 	{Type: token.OR, Content: "|"},
 	{Type: token.XOR, Content: "^"},
 	{Type: token.SHL, Content: "<<"},
+	{Type: token.SHR, Content: ">>"},
 
 	{Type: token.ADDASSIGN, Content: "+="},
 	{Type: token.SUBASSIGN, Content: "-="},
@@ -477,6 +478,7 @@ var tokens = []*token.Token{
 	{Type: token.ORASSIGN, Content: "|="},
 	{Type: token.XORASSIGN, Content: "^="},
 	{Type: token.SHLASSIGN, Content: "<<="},
+	{Type: token.SHRASSIGN, Content: ">>="},
 
 	{Type: token.LAND, Content: "&&"},
 	{Type: token.LOR, Content: "||"},
@@ -486,8 +488,10 @@ var tokens = []*token.Token{
 	{Type: token.NEWLINE, Content: "\n"},
 
 	{Type: token.LSS, Content: "<"},
+	{Type: token.GTR, Content: ">"},
 
 	{Type: token.LEQ, Content: "<="},
+	{Type: token.GEQ, Content: ">="},
 
 	// Keywords
 	{Type: token.BREAK, Content: "break"},
