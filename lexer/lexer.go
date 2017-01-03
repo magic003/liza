@@ -175,6 +175,11 @@ func (l *Lexer) NextToken() *token.Token {
 				l.next()
 				return &token.Token{Type: token.DEFINE, Position: pos, Content: string(l.src[startOffset:l.offset])}
 			}
+		case '(':
+			return &token.Token{Type: token.LPAREN, Position: pos, Content: string(l.src[startOffset:l.offset])}
+		case ')':
+			l.ignoreNewline = false
+			return &token.Token{Type: token.RPAREN, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		}
 	}
 

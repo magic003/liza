@@ -498,6 +498,11 @@ var tokens = []*token.Token{
 	{Type: token.GEQ, Content: ">="},
 	{Type: token.DEFINE, Content: ":="},
 
+	{Type: token.LPAREN, Content: "("},
+
+	{Type: token.RPAREN, Content: ")"},
+	{Type: token.NEWLINE, Content: "\n"},
+
 	// Keywords
 	{Type: token.BREAK, Content: "break"},
 	{Type: token.NEWLINE, Content: "\n"},
