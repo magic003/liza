@@ -63,6 +63,12 @@ type Lexer struct {
 
 // NextToken returns the next token from the source.
 func (l *Lexer) NextToken() *token.Token {
+	ignoreNewline := true
+	defer func() {
+		l.ignoreNewline = ignoreNewline
+	}()
+
+scanAgain:
 	l.skipWhitespace()
 
 	pos := l.currentPosition()
@@ -74,11 +80,11 @@ func (l *Lexer) NextToken() *token.Token {
 		content := l.scanIdentifier()
 		ty := token.LookupKeyword(content)
 		if ty == token.IDENT || ty == token.BREAK || ty == token.CONTINUE || ty == token.RETURN {
-			l.ignoreNewline = false
+			ignoreNewline = false
 		}
 		return &token.Token{Type: ty, Position: pos, Content: content}
 	case '0' <= ch && ch <= '9':
-		l.ignoreNewline = false
+		ignoreNewline = false
 		ty, content := l.scanNumber(false)
 		return &token.Token{Type: ty, Position: pos, Content: content}
 	default:
@@ -86,14 +92,12 @@ func (l *Lexer) NextToken() *token.Token {
 		switch ch {
 		case -1:
 			if !l.ignoreNewline {
-				l.ignoreNewline = true
 				return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
 			}
 
 			return &token.Token{Type: token.EOF, Position: pos, Content: ""}
 		case '\n':
 			// only reach here if ignoreNewline was false and exited from skipWhitespace()
-			l.ignoreNewline = true
 			return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
 		case '/':
 			if l.ch == '/' || l.ch == '*' { // comment
@@ -104,14 +108,13 @@ func (l *Lexer) NextToken() *token.Token {
 					l.ch = '/'
 					l.offset = offset - 1
 					l.rdOffset = offset
-					l.ignoreNewline = true
 					return &token.Token{Type: token.NEWLINE, Position: pos, Content: "\n"}
 				}
 				comment := l.scanComment()
 				if l.mode&ScanComments == 0 {
 					// skip comment and return next token
-					l.ignoreNewline = true
-					return l.NextToken()
+					l.ignoreNewline = true // if newline needs to be returned, it should be returned before this
+					goto scanAgain
 				}
 				return &token.Token{Type: token.COMMENT, Position: pos, Content: comment}
 			}
@@ -119,29 +122,29 @@ func (l *Lexer) NextToken() *token.Token {
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '.':
 			if '0' <= l.ch && l.ch <= '9' {
-				l.ignoreNewline = false
+				ignoreNewline = false
 				ty, content := l.scanNumber(true)
 				return &token.Token{Type: ty, Position: pos, Content: content}
 			}
 			return &token.Token{Type: token.PERIOD, Position: pos, Content: "."}
 		case '"':
-			l.ignoreNewline = false
+			ignoreNewline = false
 			content := l.scanString()
 			return &token.Token{Type: token.STRING, Position: pos, Content: content}
 		case '`':
-			l.ignoreNewline = false
+			ignoreNewline = false
 			content := l.scanRawString()
 			return &token.Token{Type: token.STRING, Position: pos, Content: content}
 		case '+':
 			ty := l.switch3(token.ADD, token.ADDASSIGN, '+', token.INC)
 			if ty == token.INC {
-				l.ignoreNewline = false
+				ignoreNewline = false
 			}
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '-':
 			ty := l.switch3(token.SUB, token.SUBASSIGN, '-', token.DEC)
 			if ty == token.DEC {
-				l.ignoreNewline = false
+				ignoreNewline = false
 			}
 			return &token.Token{Type: ty, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '*':
@@ -180,17 +183,17 @@ func (l *Lexer) NextToken() *token.Token {
 		case '(':
 			return &token.Token{Type: token.LPAREN, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case ')':
-			l.ignoreNewline = false
+			ignoreNewline = false
 			return &token.Token{Type: token.RPAREN, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '[':
 			return &token.Token{Type: token.LBRACK, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case ']':
-			l.ignoreNewline = false
+			ignoreNewline = false
 			return &token.Token{Type: token.RBRACK, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '{':
 			return &token.Token{Type: token.LBRACE, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case '}':
-			l.ignoreNewline = false
+			ignoreNewline = false
 			return &token.Token{Type: token.RBRACE, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case ',':
 			return &token.Token{Type: token.COMMA, Position: pos, Content: ","}
@@ -201,6 +204,7 @@ func (l *Lexer) NextToken() *token.Token {
 	if ch == bom {
 		l.error(l.line, l.col, fmt.Sprintf("illegal character %#U", ch))
 	}
+	ignoreNewline = l.ignoreNewline // reserver ignoreNewline info
 	return &token.Token{Type: token.ILLEGAL, Position: pos, Content: string(ch)}
 }
 

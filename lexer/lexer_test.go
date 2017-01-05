@@ -661,3 +661,154 @@ func TestNextToken(t *testing.T) {
 		epos.Line += newlineCount(etk.Content) + whitespacesLinecount
 	}
 }
+
+func checkNewline(t *testing.T, line string, mode Mode) {
+	filename := "test_file.liza"
+	lexer := New(filename, []byte(line), nil, mode)
+
+	tok := lexer.NextToken()
+	for tok.Type != token.EOF {
+		if tok.Type == token.ILLEGAL { // the illegal token literal indicates there must be a newline following
+			// next token must be a newline
+			pos := token.Position{
+				Filename: filename,
+				Line:     tok.Position.Line,
+				Column:   tok.Position.Column + 1,
+			}
+			tok = lexer.NextToken()
+			if tok.Type == token.NEWLINE {
+				if tok.Content != "\n" {
+					t.Errorf(`bad content for %q: got %q, expected %q`, line, tok.Content, "\n")
+				}
+				checkPos(t, line, tok.Position, pos)
+			} else {
+				t.Errorf("bad token for %q: got %s, expected NEWLINE", line, tok)
+			}
+		} else if tok.Type == token.NEWLINE {
+			t.Errorf("bad token for %q: got NEWLINE, expected no NEWLINE", line)
+		}
+		tok = lexer.NextToken()
+	}
+}
+
+var lines = []string{
+	// $ indicates an automatically inserted newline
+	"",
+	"\ufeff\n", // first BOM is ignored
+	"\n",
+	"foo$\n",
+	"123$\n",
+	"1.2$\n",
+	`"x"` + "$\n",
+	"`x`$\n",
+
+	"+\n",
+	"-\n",
+	"*\n",
+	"/\n",
+	"%\n",
+
+	"&\n",
+	"|\n",
+	"^\n",
+	"<<\n",
+	">>\n",
+
+	"+=\n",
+	"-=\n",
+	"*=\n",
+	"/=\n",
+	"%=\n",
+
+	"&=\n",
+	"|=\n",
+	"^=\n",
+	"<<=\n",
+	">>=\n",
+
+	"&&\n",
+	"||\n",
+	"++$\n",
+	"--$\n",
+
+	"==\n",
+	"<\n",
+	">\n",
+	"=\n",
+	"!\n",
+
+	"!=\n",
+	"<=\n",
+	">=\n",
+	":=\n",
+
+	"(\n",
+	"[\n",
+	"{\n",
+	",\n",
+	".\n",
+
+	")$\n",
+	"]$\n",
+	"}$\n",
+
+	"break$\n",
+	"class\n",
+	"const\n",
+	"continue$\n",
+	"else\n",
+
+	"enum\n",
+	"for\n",
+	"fun\n",
+	"if\n",
+	"implements\n",
+
+	"import\n",
+	"interface\n",
+	"match\n",
+	"package\n",
+	"public\n",
+
+	"return$\n",
+
+	"foo /*comment*/ /=",
+
+	"foo$//comment\n",
+	"foo$//comment",
+	"foo$/*comment*/\n",
+	"foo$/*\n*/",
+	"foo$/*comment*/    \n",
+	"foo$/*\n*/    ",
+
+	"foo    $// comment\n",
+	"foo    $// comment",
+	"foo    $/*comment*/\n",
+	"foo    $/*\n*/",
+	"foo    $/*  */ /* \n */ bar$/**/\n",
+	"foo    $/*0*/ /*1*/ /*2*/\n",
+
+	"foo    $/*comment*/    \n",
+	"foo    $/*0*/ /*1*/ /*2*/    \n",
+	"foo	$/**/ /*-------------*/       /*----\n*/bar       $/*  \n*/baa$\n",
+	"foo    $/* an EOF terminates a line */",
+	"foo    $/* an EOF terminates a line */ /*",
+	"foo    $/* an EOF terminates a line */ //",
+
+	"package main$",
+	"package main$\n\nfun main() {\n\tif {\n\t\treturn /* */ }$\n}$\n",
+}
+
+func TestNewline(t *testing.T) {
+	for _, line := range lines {
+		checkNewline(t, line, 0)
+		checkNewline(t, line, ScanComments)
+
+		// if the input ended in newlines, the input must tokenize the
+		// same with or without those newlines
+		for i := len(line) - 1; i >= 0 && line[i] == '\n'; i-- {
+			checkNewline(t, line[0:i], 0)
+			checkNewline(t, line[0:i], ScanComments)
+		}
+	}
+}
