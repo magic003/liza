@@ -812,3 +812,111 @@ func TestNewline(t *testing.T) {
 		}
 	}
 }
+
+func checkError(t *testing.T, src string, etok token.Type, content string, cols []int, errs []string) {
+	filename := "test_file.liza"
+
+	var (
+		errCount int
+		errMsgs  []string
+		errPoses []token.Position
+	)
+	errHandler := func(pos token.Position, msg string) {
+		errCount++
+		errPoses = append(errPoses, pos)
+		errMsgs = append(errMsgs, msg)
+	}
+
+	lexer := New(filename, []byte(src), errHandler, ScanComments)
+
+	tok := lexer.NextToken()
+	if tok.Type != etok {
+		t.Errorf("%q: got %s, expected %s", src, tok.Type, etok)
+	}
+	if tok.Type != token.ILLEGAL && tok.Content != content {
+		t.Errorf("%q: got content %q, expected %q", src, tok.Content, content)
+	}
+
+	if errCount != len(errs) {
+		t.Errorf("%q: got errCount %d, expected %d", src, errCount, len(errs))
+	} else {
+		for i, err := range errs {
+			if errMsgs[i] != err {
+				t.Errorf("%q: got errMsg %q, expected %q", src, errMsgs[i], err)
+			}
+			if errPoses[i].Column != cols[i] {
+				t.Errorf("%q, got column %d, expected %d", src, errPoses[i].Column, cols[i])
+			}
+		}
+	}
+}
+
+var errors = []struct {
+	src     string
+	tokType token.Type
+	cols    []int
+	content string
+	errs    []string
+}{
+	{"\a", token.ILLEGAL, []int{1}, "", []string{"illegal character U+0007"}},
+	{`#`, token.ILLEGAL, []int{1}, "", []string{"illegal character U+0023 '#'"}},
+	{`:`, token.ILLEGAL, []int{1}, "", []string{"illegal character U+003A ':'"}},
+	{`…`, token.ILLEGAL, []int{1}, "", []string{"illegal character U+2026 '…'"}},
+	{"0x", token.INT, []int{1}, "0x", []string{"illegal hexadecimal number"}},
+	{"0X", token.INT, []int{1}, "0X", []string{"illegal hexadecimal number"}},
+	{"0b", token.INT, []int{1}, "0b", []string{"illegal binary number"}},
+	{"0B", token.INT, []int{1}, "0B", []string{"illegal binary number"}},
+	{"078", token.INT, []int{1}, "078", []string{"illegal octal number"}},
+	{"07800000009", token.INT, []int{1}, "07800000009", []string{"illegal octal number"}},
+	{"0E", token.FLOAT, []int{1}, "0E", []string{"illegal floating-point exponent"}},
+	{`"\8"`, token.STRING, []int{3}, `"\8"`, []string{"unknown escape sequence"}},
+	{`"\`, token.STRING, []int{3, 1}, `"\`, []string{"escape sequence not terminated", "string literal not terminated"}},
+
+	{`"\0"`, token.STRING, []int{3}, `"\0"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\07"`, token.STRING, []int{3}, `"\07"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\08"`, token.STRING, []int{3}, `"\08"`, []string{"illegal character U+0038 '8' in escape sequence"}},
+	{`"\0`, token.STRING, []int{3, 1}, `"\0`, []string{"escape sequence not terminated", "string literal not terminated"}},
+
+	{`"\x"`, token.STRING, []int{3}, `"\x"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\x0"`, token.STRING, []int{3}, `"\x0"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\x0g"`, token.STRING, []int{3}, `"\x0g"`, []string{"illegal character U+0067 'g' in escape sequence"}},
+	{`"\x`, token.STRING, []int{3, 1}, `"\x`, []string{"escape sequence not terminated", "string literal not terminated"}},
+
+	{`"\u"`, token.STRING, []int{3}, `"\u"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\u0"`, token.STRING, []int{3}, `"\u0"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\u00"`, token.STRING, []int{3}, `"\u00"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\u000"`, token.STRING, []int{3}, `"\u000"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\u000`, token.STRING, []int{3, 1}, `"\u000`, []string{"escape sequence not terminated", "string literal not terminated"}},
+
+	{`"\U"`, token.STRING, []int{3}, `"\U"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U0"`, token.STRING, []int{3}, `"\U0"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U00"`, token.STRING, []int{3}, `"\U00"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U000"`, token.STRING, []int{3}, `"\U000"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U0000"`, token.STRING, []int{3}, `"\U0000"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U00000"`, token.STRING, []int{3}, `"\U00000"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U000000"`, token.STRING, []int{3}, `"\U000000"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U0000000"`, token.STRING, []int{3}, `"\U0000000"`, []string{"illegal character U+0022 '\"' in escape sequence"}},
+	{`"\U0000000`, token.STRING, []int{3, 1}, `"\U0000000`, []string{"escape sequence not terminated", "string literal not terminated"}},
+
+	{`"\Uffffffff"`, token.STRING, []int{3}, `"\Uffffffff"`, []string{"escape sequence is invalid Unicode code point"}},
+
+	{`"abc`, token.STRING, []int{1}, `"abc`, []string{"string literal not terminated"}},
+	{"\"abc\n", token.STRING, []int{1}, `"abc`, []string{"string literal not terminated"}},
+	{"\"abc\n   ", token.STRING, []int{1}, `"abc`, []string{"string literal not terminated"}},
+	{"`", token.STRING, []int{1}, "`", []string{"raw string literal not terminated"}},
+	{"\"abc\x00def\"", token.STRING, []int{5}, "\"abc\x00def\"", []string{"illegal character NULL"}},
+	{"\"abc\x80def\"", token.STRING, []int{5}, "\"abc\x80def\"", []string{"illegal UTF-8 encoding"}},
+
+	{"/*", token.COMMENT, []int{1}, "/*", []string{"comment not terminated"}},
+
+	// only first BOM is ignored
+	{"\ufeff\ufeff", token.ILLEGAL, []int{2}, "\ufeff\ufeff", []string{"illegal byte order mark"}},
+	{"//\ufeff", token.COMMENT, []int{3}, "//\ufeff", []string{"illegal byte order mark"}},
+	{`"` + "abc\ufeffdef" + `"`, token.STRING, []int{5}, `"` + "abc\ufeffdef" + `"`, []string{"illegal byte order mark"}},
+}
+
+func TestNextTokenErrors(t *testing.T) {
+	for _, e := range errors {
+		checkError(t, e.src, e.tokType, e.content, e.cols, e.errs)
+	}
+}

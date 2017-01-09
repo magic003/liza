@@ -201,8 +201,8 @@ scanAgain:
 	}
 
 	// unexpected bom is already reported in next(), don't repeat it here
-	if ch == bom {
-		l.error(l.line, l.col, fmt.Sprintf("illegal character %#U", ch))
+	if ch != bom {
+		l.error(l.line, l.col-1, fmt.Sprintf("illegal character %#U", ch))
 	}
 	ignoreNewline = l.ignoreNewline // reserver ignoreNewline info
 	return &token.Token{Type: token.ILLEGAL, Position: pos, Content: string(ch)}
@@ -246,8 +246,8 @@ func (l *Lexer) error(line int, col int, msg string) {
 	if l.errHandler != nil {
 		pos := token.Position{
 			Filename: l.filename,
-			Line:     l.line,
-			Column:   l.col,
+			Line:     line,
+			Column:   col,
 		}
 		l.errHandler(pos, msg)
 	}
@@ -344,6 +344,8 @@ func (l *Lexer) skipWhitespace() {
 func (l *Lexer) scanComment() string {
 	// initial '/' is already consumed; l.ch == '/' || l.ch == '*'
 	offset := l.offset - 1
+	line := l.line
+	col := l.col - 1
 	hasCR := false
 
 	if l.ch == '/' { //-style comment
@@ -372,7 +374,7 @@ func (l *Lexer) scanComment() string {
 	}
 
 	// reach here means the comment is not terminated
-	l.error(l.line, l.col, "comment not terminated")
+	l.error(line, col, "comment not terminated")
 
 exit:
 	comment := l.src[offset:l.offset]
@@ -522,7 +524,7 @@ func (l *Lexer) scanEscape(quote rune) bool {
 	var x uint32
 	for n > 0 {
 		d := uint32(l.digitValue(l.ch))
-		if d > base {
+		if d >= base {
 			msg := fmt.Sprintf("illegal character %#U in escape sequence", l.ch)
 			if l.ch < 0 {
 				msg = "escape sequence not terminated"
@@ -547,7 +549,7 @@ func (l *Lexer) scanString() string {
 	// '"' is already consumed
 	offset := l.offset - 1
 	line := l.line
-	col := l.col
+	col := l.col - 1
 
 	for {
 		ch := l.ch
@@ -571,7 +573,7 @@ func (l *Lexer) scanRawString() string {
 	// '`' is already consumed
 	offset := l.offset - 1
 	line := l.line
-	col := l.col
+	col := l.col - 1
 
 	hasCR := false
 	for {
