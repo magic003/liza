@@ -48,12 +48,12 @@ func TestExpr(t *testing.T) {
 			}
 
 			if result.Line != expectedResults[i].Line {
-				t.Errorf("bad line for %s %s: got %s, expected %s",
+				t.Errorf("bad line for %s %s: got %v, expected %v",
 					tc.desc, names[i], result.Line, expectedResults[i].Line)
 			}
 
 			if result.Column != expectedResults[i].Column {
-				t.Errorf("bad column for %s %s: got %s, expected %s",
+				t.Errorf("bad column for %s %s: got %v, expected %v",
 					tc.desc, names[i], result.Column, expectedResults[i].Column)
 			}
 		}
