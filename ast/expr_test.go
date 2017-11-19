@@ -15,12 +15,15 @@ var testCases = []struct {
 	{
 		desc: "Ident",
 		expr: &Ident{
-			NamePos: token.Position{
-				Filename: "test.lz",
-				Line:     10,
-				Column:   26,
+			token: token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "testVar",
 			},
-			Name: "testVar",
 		},
 		expectedPos: token.Position{
 			Filename: "test.lz",

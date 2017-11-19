@@ -12,21 +12,20 @@ type Expr interface {
 
 // Ident is a node represents an identifier.
 type Ident struct {
-	NamePos token.Position // identifier position
-	Name    string         // identifier name
+	token token.Token // identifier token
 }
 
 // Pos implementation for Node.
 func (ident *Ident) Pos() token.Position {
-	return ident.NamePos
+	return ident.token.Position
 }
 
 // End implementation for Node.
 func (ident *Ident) End() token.Position {
 	return token.Position{
-		Filename: ident.NamePos.Filename,
-		Line:     ident.NamePos.Line,
-		Column:   ident.NamePos.Column + len(ident.Name),
+		Filename: ident.token.Position.Filename,
+		Line:     ident.token.Position.Line,
+		Column:   ident.token.Position.Column + len(ident.token.Content),
 	}
 }
 
