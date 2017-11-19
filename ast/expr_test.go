@@ -36,6 +36,30 @@ var testCases = []struct {
 			Column:   26 + 7,
 		},
 	},
+	{
+		desc: "BasicLit",
+		expr: &BasicLit{
+			token: token.Token{
+				Type: token.INT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "12345",
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26 + 5,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {
