@@ -51,3 +51,26 @@ func (lit *BasicLit) End() token.Position {
 }
 
 func (lit *BasicLit) exprNode() {}
+
+// ArrayLit is a node represents array literal.
+type ArrayLit struct {
+	Lbrack token.Position // position of "["
+	Elts   []Expr         // list of array elements
+	Rbrack token.Position // position of "]"
+}
+
+// Pos implementation for Node.
+func (lit *ArrayLit) Pos() token.Position {
+	return lit.Lbrack
+}
+
+// End implementation for Node.
+func (lit *ArrayLit) End() token.Position {
+	return token.Position{
+		Filename: lit.Rbrack.Filename,
+		Line:     lit.Rbrack.Line,
+		Column:   lit.Rbrack.Column + 1,
+	}
+}
+
+func (lit *ArrayLit) exprNode() {}
