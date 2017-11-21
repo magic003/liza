@@ -202,6 +202,43 @@ var testCases = []struct {
 			Column:   51,
 		},
 	},
+	{
+		desc: "SelectorExpr",
+		expr: &SelectorExpr{
+			X: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Sel: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   35,
+					},
+					Content: "testMethod",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   35 + 10,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

@@ -162,3 +162,21 @@ func (expr *ParenExpr) End() token.Position {
 }
 
 func (expr *ParenExpr) exprNode() {}
+
+// SelectorExpr is a node represents a selector expression.
+type SelectorExpr struct {
+	X   Expr   // expression
+	Sel *Ident // selector
+}
+
+// Pos implementation for Node.
+func (expr *SelectorExpr) Pos() token.Position {
+	return expr.X.Pos()
+}
+
+// End implementation for Node.
+func (expr *SelectorExpr) End() token.Position {
+	return expr.Sel.End()
+}
+
+func (expr *SelectorExpr) exprNode() {}
