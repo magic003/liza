@@ -127,6 +127,31 @@ var testCases = []struct {
 			Column:   17,
 		},
 	},
+	{
+		desc: "MapLit",
+		expr: &MapLit{
+			Lbrace: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   50,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   51,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

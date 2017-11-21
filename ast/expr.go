@@ -93,3 +93,26 @@ func (kv *KeyValueExpr) End() token.Position {
 }
 
 func (kv *KeyValueExpr) exprNode() {}
+
+// MapLit is a node represents map literal.
+type MapLit struct {
+	Lbrace token.Position // position of "{"
+	Elts   []KeyValueExpr // list of key value elements
+	Rbrace token.Position // position of "}"
+}
+
+// Pos implementation for Node.
+func (lit *MapLit) Pos() token.Position {
+	return lit.Lbrace
+}
+
+// End implementation for Node.
+func (lit *MapLit) End() token.Position {
+	return token.Position{
+		Filename: lit.Rbrace.Filename,
+		Line:     lit.Rbrace.Line,
+		Column:   lit.Rbrace.Column + 1,
+	}
+}
+
+func (lit *MapLit) exprNode() {}
