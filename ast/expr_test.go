@@ -85,6 +85,48 @@ var testCases = []struct {
 			Column:   51,
 		},
 	},
+	{
+		desc: "KeyValueExpr",
+		expr: &KeyValueExpr{
+			Key: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testValue",
+				},
+			},
+			Colon: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   36,
+			},
+			Value: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     11,
+						Column:   10,
+					},
+					Content: "testKey",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     11,
+			Column:   17,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

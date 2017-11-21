@@ -74,3 +74,22 @@ func (lit *ArrayLit) End() token.Position {
 }
 
 func (lit *ArrayLit) exprNode() {}
+
+// KeyValueExpr is a node represents (key : value) pairs.
+type KeyValueExpr struct {
+	Key   Expr
+	Colon token.Position // position of ":"
+	Value Expr
+}
+
+// Pos implementation for Node.
+func (kv *KeyValueExpr) Pos() token.Position {
+	return kv.Key.Pos()
+}
+
+// End implementation for Node.
+func (kv *KeyValueExpr) End() token.Position {
+	return kv.Value.End()
+}
+
+func (kv *KeyValueExpr) exprNode() {}
