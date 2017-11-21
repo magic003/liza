@@ -139,3 +139,26 @@ func (lit *TupleLit) End() token.Position {
 }
 
 func (lit *TupleLit) exprNode() {}
+
+// ParenExpr is a node represents a parenthesized expression.
+type ParenExpr struct {
+	Lparen token.Position // position of "("
+	X      Expr           // parenthesized expression
+	Rparen token.Position // position of ")"
+}
+
+// Pos implementation for Node.
+func (expr *ParenExpr) Pos() token.Position {
+	return expr.Lparen
+}
+
+// End implementation for Node.
+func (expr *ParenExpr) End() token.Position {
+	return token.Position{
+		Filename: expr.Rparen.Filename,
+		Line:     expr.Rparen.Line,
+		Column:   expr.Rparen.Column + 1,
+	}
+}
+
+func (expr *ParenExpr) exprNode() {}
