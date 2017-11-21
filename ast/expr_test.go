@@ -152,6 +152,31 @@ var testCases = []struct {
 			Column:   51,
 		},
 	},
+	{
+		desc: "TupleLit",
+		expr: &TupleLit{
+			Lparen: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Rparen: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   50,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   51,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

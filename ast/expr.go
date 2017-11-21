@@ -116,3 +116,26 @@ func (lit *MapLit) End() token.Position {
 }
 
 func (lit *MapLit) exprNode() {}
+
+// TupleLit is a node represents tuple literal.
+type TupleLit struct {
+	Lparen token.Position // position of "("
+	Elts   []Expr         // list of elements
+	Rparen token.Position // positionof ")"
+}
+
+// Pos implementation for Node.
+func (lit *TupleLit) Pos() token.Position {
+	return lit.Lparen
+}
+
+// End implementation for Node.
+func (lit *TupleLit) End() token.Position {
+	return token.Position{
+		Filename: lit.Rparen.Filename,
+		Line:     lit.Rparen.Line,
+		Column:   lit.Rparen.Column + 1,
+	}
+}
+
+func (lit *TupleLit) exprNode() {}
