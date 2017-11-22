@@ -65,3 +65,22 @@ func (stmt *IncDecStmt) End() token.Position {
 }
 
 func (stmt *IncDecStmt) stmtNode() {}
+
+// AssignStmt node represents an assignment statement.
+type AssignStmt struct {
+	LHS    Expr
+	Assign token.Token // assignment token
+	RHS    Expr
+}
+
+// Pos implementation for Node.
+func (stmt *AssignStmt) Pos() token.Position {
+	return stmt.LHS.Pos()
+}
+
+// End implementation for Node.
+func (stmt *AssignStmt) End() token.Position {
+	return stmt.RHS.End()
+}
+
+func (stmt *AssignStmt) stmtNode() {}

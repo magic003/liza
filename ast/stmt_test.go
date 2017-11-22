@@ -135,6 +135,52 @@ var stmtTestCases = []struct {
 			Column:   36,
 		},
 	},
+	{
+		desc: "AssignStmt",
+		stmt: &AssignStmt{
+			LHS: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Assign: token.Token{
+				Type: token.ASSIGN,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   34,
+				},
+				Content: "=",
+			},
+			RHS: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   36,
+					},
+					Content: "testVar2",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   44,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {
