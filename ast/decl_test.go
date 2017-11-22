@@ -43,6 +43,41 @@ var declTestCases = []struct {
 			Column:   46 + 5,
 		},
 	},
+	{
+		desc: "VarDecl",
+		decl: &VarDecl{
+			Ident: token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "testVar",
+			},
+			Value: &BasicLit{
+				token: token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   46,
+					},
+					Content: "12345",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   46 + 5,
+		},
+	},
 }
 
 func TestDecl(t *testing.T) {
