@@ -370,6 +370,52 @@ var testCases = []struct {
 			Column:   34,
 		},
 	},
+	{
+		desc: "BinaryExpr",
+		expr: &BinaryExpr{
+			X: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Op: token.Token{
+				Type: token.ADD,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   33,
+				},
+				Content: "+",
+			},
+			Y: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   34,
+					},
+					Content: "y",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   35,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

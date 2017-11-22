@@ -246,3 +246,22 @@ func (unary *UnaryExpr) End() token.Position {
 }
 
 func (unary *UnaryExpr) exprNode() {}
+
+// BinaryExpr node represents a binary expression.
+type BinaryExpr struct {
+	X  Expr        // left operand
+	Op token.Token // operator
+	Y  Expr        // right operand
+}
+
+// Pos implementation for Node.
+func (binary *BinaryExpr) Pos() token.Position {
+	return binary.X.Pos()
+}
+
+// End implementation for Node.
+func (binary *BinaryExpr) End() token.Position {
+	return binary.Y.End()
+}
+
+func (binary *BinaryExpr) exprNode() {}
