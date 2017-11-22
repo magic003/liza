@@ -335,6 +335,41 @@ var testCases = []struct {
 			Column:   48,
 		},
 	},
+	{
+		desc: "UnaryExpr",
+		expr: &UnaryExpr{
+			Op: token.Token{
+				Type: token.SUB,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "-",
+			},
+			X: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   27,
+					},
+					Content: "testVar",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   34,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

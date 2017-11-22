@@ -228,3 +228,21 @@ func (call *CallExpr) End() token.Position {
 }
 
 func (call *CallExpr) exprNode() {}
+
+// UnaryExpr node represents an unary expression.
+type UnaryExpr struct {
+	Op token.Token // operator
+	X  Expr        // operand
+}
+
+// Pos implementation for Node.
+func (unary *UnaryExpr) Pos() token.Position {
+	return unary.Op.Position
+}
+
+// End implementation for Node.
+func (unary *UnaryExpr) End() token.Position {
+	return unary.X.End()
+}
+
+func (unary *UnaryExpr) exprNode() {}
