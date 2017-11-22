@@ -84,3 +84,29 @@ func (stmt *AssignStmt) End() token.Position {
 }
 
 func (stmt *AssignStmt) stmtNode() {}
+
+// ReturnStmt node represents a return statement.
+type ReturnStmt struct {
+	Return token.Token // position of "return"
+	Value  Expr        // returned value expression, optional
+}
+
+// Pos implementation for Node.
+func (stmt *ReturnStmt) Pos() token.Position {
+	return stmt.Return.Position
+}
+
+// End implementation for Node.
+func (stmt *ReturnStmt) End() token.Position {
+	if stmt.Value != nil {
+		return stmt.Value.End()
+	}
+
+	return token.Position{
+		Filename: stmt.Return.Position.Filename,
+		Line:     stmt.Return.Position.Line,
+		Column:   stmt.Return.Position.Column + len(stmt.Return.Content),
+	}
+}
+
+func (stmt *ReturnStmt) stmtNode() {}

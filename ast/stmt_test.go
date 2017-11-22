@@ -181,6 +181,65 @@ var stmtTestCases = []struct {
 			Column:   44,
 		},
 	},
+	{
+		desc: "ReturnStmt",
+		stmt: &ReturnStmt{
+			Return: token.Token{
+				Type: token.RETURN,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "return",
+			},
+			Value: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   33,
+					},
+					Content: "testVar",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   40,
+		},
+	},
+	{
+		desc: "ReturnStmt",
+		stmt: &ReturnStmt{
+			Return: token.Token{
+				Type: token.RETURN,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "return",
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   32,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {
