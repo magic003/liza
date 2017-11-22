@@ -95,3 +95,26 @@ func (mapType *MapType) End() token.Position {
 }
 
 func (mapType *MapType) typeNode() {}
+
+// TupleType node represents a tuple type.
+type TupleType struct {
+	Lparen token.Position // position of "("
+	Elts   []Type         // element types
+	Rparen token.Position // position of ")"
+}
+
+// Pos implementation for Node.
+func (tuple *TupleType) Pos() token.Position {
+	return tuple.Lparen
+}
+
+// End implementation for Node.
+func (tuple *TupleType) End() token.Position {
+	return token.Position{
+		Filename: tuple.Rparen.Filename,
+		Line:     tuple.Rparen.Line,
+		Column:   tuple.Rparen.Column + 1,
+	}
+}
+
+func (tuple *TupleType) typeNode() {}

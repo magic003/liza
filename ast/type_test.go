@@ -125,6 +125,31 @@ var typeTestCases = []struct {
 			Column:   37,
 		},
 	},
+	{
+		desc: "TupleType",
+		typeNode: &TupleType{
+			Lparen: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Rparen: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   36,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   37,
+		},
+	},
 }
 
 func TestType(t *testing.T) {
