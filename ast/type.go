@@ -30,3 +30,25 @@ func (basic *BasicType) End() token.Position {
 }
 
 func (basic *BasicType) typeNode() {}
+
+// SelectorType node represents a type defined in a package.e
+type SelectorType struct {
+	Package token.Token // package identifier
+	Sel     token.Token //  type selector
+}
+
+// Pos implementation for Node.
+func (selector *SelectorType) Pos() token.Position {
+	return selector.Package.Position
+}
+
+// End implementation for Node.
+func (selector *SelectorType) End() token.Position {
+	return token.Position{
+		Filename: selector.Sel.Position.Filename,
+		Line:     selector.Sel.Position.Line,
+		Column:   selector.Sel.Position.Column + len(selector.Sel.Content),
+	}
+}
+
+func (selector *SelectorType) typeNode() {}

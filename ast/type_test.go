@@ -36,6 +36,39 @@ var typeTestCases = []struct {
 			Column:   26 + 3,
 		},
 	},
+	{
+		desc: "SelectorType",
+		typeNode: &SelectorType{
+			Package: token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "testpackage",
+			},
+			Sel: token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   38,
+				},
+				Content: "testtype",
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   46,
+		},
+	},
 }
 
 func TestType(t *testing.T) {
