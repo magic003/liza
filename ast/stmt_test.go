@@ -100,6 +100,41 @@ var stmtTestCases = []struct {
 			Column:   48,
 		},
 	},
+	{
+		desc: "IncDecStmt",
+		stmt: &IncDecStmt{
+			Expr: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Op: token.Token{
+				Type: token.INC,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   34,
+				},
+				Content: "++",
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   36,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {

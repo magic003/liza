@@ -4,7 +4,7 @@ import (
 	"github.com/magic003/liza/token"
 )
 
-// Stmt is the base type for all statment tree nodes.
+// Stmt is the base type for all statement tree nodes.
 type Stmt interface {
 	Node
 	stmtNode()
@@ -43,3 +43,25 @@ func (stmt *ExprStmt) End() token.Position {
 }
 
 func (stmt *ExprStmt) stmtNode() {}
+
+// IncDecStmt node represents an increasement or decreasement statement.
+type IncDecStmt struct {
+	Expr Expr        // expression
+	Op   token.Token // INC or DEC
+}
+
+// Pos implementation for Node.
+func (stmt *IncDecStmt) Pos() token.Position {
+	return stmt.Expr.Pos()
+}
+
+// End implementation for Node.
+func (stmt *IncDecStmt) End() token.Position {
+	return token.Position{
+		Filename: stmt.Op.Position.Filename,
+		Line:     stmt.Op.Position.Line,
+		Column:   stmt.Op.Position.Column + len(stmt.Op.Content),
+	}
+}
+
+func (stmt *IncDecStmt) stmtNode() {}
