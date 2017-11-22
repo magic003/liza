@@ -26,3 +26,20 @@ func (stmt *DeclStmt) End() token.Position {
 }
 
 func (stmt *DeclStmt) stmtNode() {}
+
+// ExprStmt node represents a standalone expression.
+type ExprStmt struct {
+	Expr Expr // expression
+}
+
+// Pos implementation for Node.
+func (stmt *ExprStmt) Pos() token.Position {
+	return stmt.Expr.Pos()
+}
+
+// End implementation for Node.
+func (stmt *ExprStmt) End() token.Position {
+	return stmt.Expr.End()
+}
+
+func (stmt *ExprStmt) stmtNode() {}

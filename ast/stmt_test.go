@@ -49,6 +49,57 @@ var stmtTestCases = []struct {
 			Column:   46 + 5,
 		},
 	},
+	{
+		desc: "ExprStmt",
+		stmt: &ExprStmt{
+			Expr: &CallExpr{
+				Fun: &SelectorExpr{
+					X: &Ident{
+						token: token.Token{
+							Type: token.IDENT,
+							Position: token.Position{
+								Filename: "test.lz",
+								Line:     10,
+								Column:   26,
+							},
+							Content: "testVar",
+						},
+					},
+					Sel: &Ident{
+						token: token.Token{
+							Type: token.IDENT,
+							Position: token.Position{
+								Filename: "test.lz",
+								Line:     10,
+								Column:   35,
+							},
+							Content: "testMethod",
+						},
+					},
+				},
+				Lparen: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   46,
+				},
+				Rparen: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   47,
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   48,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {
