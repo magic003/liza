@@ -69,6 +69,37 @@ var typeTestCases = []struct {
 			Column:   46,
 		},
 	},
+	{
+		desc: "ArrayType",
+		typeNode: &ArrayType{
+			Lbrack: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			EltType: &BasicType{
+				Ident: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   28,
+					},
+					Content: "int",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   31,
+		},
+	},
 }
 
 func TestType(t *testing.T) {

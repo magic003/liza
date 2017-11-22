@@ -31,7 +31,7 @@ func (basic *BasicType) End() token.Position {
 
 func (basic *BasicType) typeNode() {}
 
-// SelectorType node represents a type defined in a package.e
+// SelectorType node represents a type defined in a package.
 type SelectorType struct {
 	Package token.Token // package identifier
 	Sel     token.Token //  type selector
@@ -52,3 +52,22 @@ func (selector *SelectorType) End() token.Position {
 }
 
 func (selector *SelectorType) typeNode() {}
+
+// ArrayType node represents an array type.
+type ArrayType struct {
+	Lbrack  token.Position // position of "["
+	Rbrack  token.Position // position of "]"
+	EltType Type           // element type
+}
+
+// Pos implementation for Node.
+func (array *ArrayType) Pos() token.Position {
+	return array.Lbrack
+}
+
+// End implementation for Node.
+func (array *ArrayType) End() token.Position {
+	return array.EltType.End()
+}
+
+func (array *ArrayType) typeNode() {}
