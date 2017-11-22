@@ -77,7 +77,7 @@ var typeTestCases = []struct {
 				Line:     10,
 				Column:   26,
 			},
-			EltType: &BasicType{
+			Elt: &BasicType{
 				Ident: token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
@@ -98,6 +98,31 @@ var typeTestCases = []struct {
 			Filename: "test.lz",
 			Line:     10,
 			Column:   31,
+		},
+	},
+	{
+		desc: "MapType",
+		typeNode: &MapType{
+			Lbrace: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   36,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   37,
 		},
 	},
 }

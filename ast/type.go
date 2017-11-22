@@ -55,9 +55,9 @@ func (selector *SelectorType) typeNode() {}
 
 // ArrayType node represents an array type.
 type ArrayType struct {
-	Lbrack  token.Position // position of "["
-	Rbrack  token.Position // position of "]"
-	EltType Type           // element type
+	Lbrack token.Position // position of "["
+	Rbrack token.Position // position of "]"
+	Elt    Type           // element type
 }
 
 // Pos implementation for Node.
@@ -67,7 +67,31 @@ func (array *ArrayType) Pos() token.Position {
 
 // End implementation for Node.
 func (array *ArrayType) End() token.Position {
-	return array.EltType.End()
+	return array.Elt.End()
 }
 
 func (array *ArrayType) typeNode() {}
+
+// MapType node represents a map type.
+type MapType struct {
+	Lbrace token.Position // position of "{"
+	Key    Type           // key type
+	Value  Type           // value type
+	Rbrace token.Position // position of "}"
+}
+
+// Pos implementation for Node.
+func (mapType *MapType) Pos() token.Position {
+	return mapType.Lbrace
+}
+
+// End implementation for Node.
+func (mapType *MapType) End() token.Position {
+	return token.Position{
+		Filename: mapType.Rbrace.Filename,
+		Line:     mapType.Rbrace.Line,
+		Column:   mapType.Rbrace.Column + 1,
+	}
+}
+
+func (mapType *MapType) typeNode() {}
