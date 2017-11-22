@@ -239,6 +239,53 @@ var testCases = []struct {
 			Column:   35 + 10,
 		},
 	},
+	{
+		desc: "IndexExpr",
+		expr: &IndexExpr{
+			X: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Lbrack: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   33,
+			},
+			Index: &BasicLit{
+				token: token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   34,
+					},
+					Content: "1",
+				},
+			},
+			Rbrack: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   36,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   37,
+		},
+	},
 }
 
 func TestExpr(t *testing.T) {

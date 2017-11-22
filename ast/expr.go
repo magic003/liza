@@ -180,3 +180,27 @@ func (expr *SelectorExpr) End() token.Position {
 }
 
 func (expr *SelectorExpr) exprNode() {}
+
+// IndexExpr is a node represents an expression followed by an index.
+type IndexExpr struct {
+	X      Expr           // expression
+	Lbrack token.Position // position of "["
+	Index  Expr           // index expression
+	Rbrack token.Position // position of "]"
+}
+
+// Pos implementation for Node.
+func (index *IndexExpr) Pos() token.Position {
+	return index.X.Pos()
+}
+
+// End implementation for Node.
+func (index *IndexExpr) End() token.Position {
+	return token.Position{
+		Filename: index.Rbrack.Filename,
+		Line:     index.Rbrack.Line,
+		Column:   index.Rbrack.Column + 1,
+	}
+}
+
+func (index *IndexExpr) exprNode() {}
