@@ -6,7 +6,7 @@ import (
 	"github.com/magic003/liza/token"
 )
 
-var testCases = []struct {
+var exprTestCases = []struct {
 	desc        string
 	expr        Expr
 	expectedPos token.Position
@@ -419,7 +419,7 @@ var testCases = []struct {
 }
 
 func TestExpr(t *testing.T) {
-	for _, tc := range testCases {
+	for _, tc := range exprTestCases {
 		results := []token.Position{tc.expr.Pos(), tc.expr.End()}
 		expectedResults := []token.Position{tc.expectedPos, tc.expectedEnd}
 		names := []string{"Pos()", "End()"}
