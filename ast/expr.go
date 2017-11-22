@@ -204,3 +204,27 @@ func (index *IndexExpr) End() token.Position {
 }
 
 func (index *IndexExpr) exprNode() {}
+
+// CallExpr is a node represents a function call.
+type CallExpr struct {
+	Fun    Expr           // function expression
+	Lparen token.Position // position of "("
+	Args   []Expr         // function arguments
+	Rparen token.Position // position of ")"
+}
+
+// Pos implementation for Node.
+func (call *CallExpr) Pos() token.Position {
+	return call.Fun.Pos()
+}
+
+// End implementation for Node.
+func (call *CallExpr) End() token.Position {
+	return token.Position{
+		Filename: call.Rparen.Filename,
+		Line:     call.Rparen.Line,
+		Column:   call.Rparen.Column + 1,
+	}
+}
+
+func (call *CallExpr) exprNode() {}
