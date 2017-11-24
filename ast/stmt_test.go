@@ -554,6 +554,38 @@ var stmtTestCases = []struct {
 			Column:   50,
 		},
 	},
+	{
+		desc: "ForStmt",
+		stmt: &ForStmt{
+			For: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Body: &BlockStmt{
+				Lbrace: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   46,
+				},
+				Rbrace: token.Position{
+					Filename: "test.lz",
+					Line:     13,
+					Column:   10,
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     13,
+			Column:   11,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {

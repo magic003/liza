@@ -249,3 +249,24 @@ func (stmt *CaseClause) End() token.Position {
 }
 
 func (stmt *CaseClause) stmtNode() {}
+
+// ForStmt node represents a for loop statement.
+type ForStmt struct {
+	For  token.Position // position of "for"
+	Init Stmt           // DeclStmt or AssignStmt; or nil
+	Cond Expr           // condition; or nil
+	Post Stmt           // post iteration statement; or nil
+	Body *BlockStmt
+}
+
+// Pos implementation for Node.
+func (stmt *ForStmt) Pos() token.Position {
+	return stmt.For
+}
+
+// End implementation for Node.
+func (stmt *ForStmt) End() token.Position {
+	return stmt.Body.End()
+}
+
+func (stmt *ForStmt) stmtNode() {}
