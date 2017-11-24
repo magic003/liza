@@ -131,3 +131,73 @@ func (stmt *BranchStmt) End() token.Position {
 }
 
 func (stmt *BranchStmt) stmtNode() {}
+
+// BlockStmt node represents a braced statement list.
+type BlockStmt struct {
+	Lbrace token.Position // position of "{"
+	Stmts  []Stmt
+	Rbrace token.Position // position of "}"
+}
+
+// Pos implementation for Node.
+func (stmt *BlockStmt) Pos() token.Position {
+	return stmt.Lbrace
+}
+
+// End implementation for Node.
+func (stmt *BlockStmt) End() token.Position {
+	return token.Position{
+		Filename: stmt.Rbrace.Filename,
+		Line:     stmt.Rbrace.Line,
+		Column:   stmt.Rbrace.Column + 1,
+	}
+}
+
+func (stmt *BlockStmt) stmtNode() {}
+
+// IfStmt node represents an if statement.
+type IfStmt struct {
+	If   token.Position // position of "if"
+	Cond Expr           // condition
+	Body *BlockStmt
+	Else *ElseStmt // optional else statement
+}
+
+// Pos implementation for Node.
+func (stmt *IfStmt) Pos() token.Position {
+	return stmt.If
+}
+
+// End implementation for Node.
+func (stmt *IfStmt) End() token.Position {
+	if stmt.Else != nil {
+		return stmt.Else.End()
+	}
+
+	return stmt.Body.End()
+}
+
+func (stmt *IfStmt) stmtNode() {}
+
+// ElseStmt node represents the else clause of an if statement.
+type ElseStmt struct {
+	Else token.Position // position of "else"
+	If   *IfStmt        // optional else if statement
+	Body *BlockStmt     // body; nil if it has an if statement
+}
+
+// Pos implementation for Node.
+func (stmt *ElseStmt) Pos() token.Position {
+	return stmt.Else
+}
+
+// End implementation for Node.
+func (stmt *ElseStmt) End() token.Position {
+	if stmt.If != nil {
+		return stmt.If.End()
+	}
+
+	return stmt.Body.End()
+}
+
+func (stmt *ElseStmt) stmtNode() {}

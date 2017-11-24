@@ -264,6 +264,185 @@ var stmtTestCases = []struct {
 			Column:   31,
 		},
 	},
+	{
+		desc: "BlockStmt",
+		stmt: &BlockStmt{
+			Lbrace: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     13,
+				Column:   10,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     13,
+			Column:   11,
+		},
+	},
+	{
+		desc: "IfStmt",
+		stmt: &IfStmt{
+			If: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Body: &BlockStmt{
+				Lbrace: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   46,
+				},
+				Rbrace: token.Position{
+					Filename: "test.lz",
+					Line:     13,
+					Column:   10,
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     13,
+			Column:   11,
+		},
+	},
+	{
+		desc: "IfStmt",
+		stmt: &IfStmt{
+			If: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Body: &BlockStmt{
+				Lbrace: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   46,
+				},
+				Rbrace: token.Position{
+					Filename: "test.lz",
+					Line:     13,
+					Column:   10,
+				},
+			},
+			Else: &ElseStmt{
+				Else: token.Position{
+					Filename: "test.lz",
+					Line:     13,
+					Column:   11,
+				},
+				Body: &BlockStmt{
+					Lbrace: token.Position{
+						Filename: "test.lz",
+						Line:     13,
+						Column:   13,
+					},
+					Rbrace: token.Position{
+						Filename: "test.lz",
+						Line:     18,
+						Column:   10,
+					},
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     18,
+			Column:   11,
+		},
+	},
+	{
+		desc: "ElseStmt",
+		stmt: &ElseStmt{
+			Else: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Body: &BlockStmt{
+				Lbrace: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   27,
+				},
+				Rbrace: token.Position{
+					Filename: "test.lz",
+					Line:     18,
+					Column:   10,
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     18,
+			Column:   11,
+		},
+	},
+	{
+		desc: "ElseStmt",
+		stmt: &ElseStmt{
+			Else: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			If: &IfStmt{
+				If: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   32,
+				},
+				Body: &BlockStmt{
+					Lbrace: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   46,
+					},
+					Rbrace: token.Position{
+						Filename: "test.lz",
+						Line:     13,
+						Column:   10,
+					},
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     13,
+			Column:   11,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {
