@@ -240,6 +240,30 @@ var stmtTestCases = []struct {
 			Column:   32,
 		},
 	},
+	{
+		desc: "BranchStmt",
+		stmt: &BranchStmt{
+			Tok: token.Token{
+				Type: token.BREAK,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "break",
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   31,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {

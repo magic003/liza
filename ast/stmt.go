@@ -110,3 +110,24 @@ func (stmt *ReturnStmt) End() token.Position {
 }
 
 func (stmt *ReturnStmt) stmtNode() {}
+
+// BranchStmt node represents a break or continue statement.
+type BranchStmt struct {
+	Tok token.Token // keyword token (break, continue)
+}
+
+// Pos implementation for Node.
+func (stmt *BranchStmt) Pos() token.Position {
+	return stmt.Tok.Position
+}
+
+// End implementation for Node.
+func (stmt *BranchStmt) End() token.Position {
+	return token.Position{
+		Filename: stmt.Tok.Position.Filename,
+		Line:     stmt.Tok.Position.Line,
+		Column:   stmt.Tok.Position.Column + len(stmt.Tok.Content),
+	}
+}
+
+func (stmt *BranchStmt) stmtNode() {}
