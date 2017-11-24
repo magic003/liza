@@ -443,6 +443,117 @@ var stmtTestCases = []struct {
 			Column:   11,
 		},
 	},
+	{
+		desc: "MatchStmt",
+		stmt: &MatchStmt{
+			Match: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     20,
+				Column:   26,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     20,
+			Column:   27,
+		},
+	},
+	{
+		desc: "CaseStmt",
+		stmt: &CaseStmt{
+			Pattern: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Colon: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   34,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   34,
+		},
+	},
+	{
+		desc: "CaseStmt",
+		stmt: &CaseStmt{
+			Pattern: &Ident{
+				token: token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   26,
+					},
+					Content: "testVar",
+				},
+			},
+			Colon: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   34,
+			},
+			Body: []Stmt{
+				&ReturnStmt{
+					Return: token.Token{
+						Type: token.RETURN,
+						Position: token.Position{
+							Filename: "test.lz",
+							Line:     10,
+							Column:   36,
+						},
+						Content: "return",
+					},
+					Value: &Ident{
+						token: token.Token{
+							Type: token.IDENT,
+							Position: token.Position{
+								Filename: "test.lz",
+								Line:     10,
+								Column:   43,
+							},
+							Content: "testVar",
+						},
+					},
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   50,
+		},
+	},
 }
 
 func TestStmt(t *testing.T) {

@@ -201,3 +201,51 @@ func (stmt *ElseStmt) End() token.Position {
 }
 
 func (stmt *ElseStmt) stmtNode() {}
+
+// MatchStmt node represents a match statement.
+type MatchStmt struct {
+	Match  token.Position // position of "match"
+	Expr   Expr
+	Lbrace token.Position // position of "{"
+	Cases  []*CaseStmt
+	Rbrace token.Position // position of "}"
+}
+
+// Pos implementation for Node.
+func (stmt *MatchStmt) Pos() token.Position {
+	return stmt.Match
+}
+
+// End implementation for Node.
+func (stmt *MatchStmt) End() token.Position {
+	return token.Position{
+		Filename: stmt.Rbrace.Filename,
+		Line:     stmt.Rbrace.Line,
+		Column:   stmt.Rbrace.Column + 1,
+	}
+}
+
+func (stmt *MatchStmt) stmtNode() {}
+
+// CaseStmt node represents a case clause in a match statement.
+type CaseStmt struct {
+	Pattern Expr           // matched pattern
+	Colon   token.Position // position of ":"
+	Body    []Stmt         // optional statement list
+}
+
+// Pos implementation for Node.
+func (stmt *CaseStmt) Pos() token.Position {
+	return stmt.Pattern.Pos()
+}
+
+// End implementation for Node.
+func (stmt *CaseStmt) End() token.Position {
+	if n := len(stmt.Body); n > 0 {
+		return stmt.Body[n-1].End()
+	}
+
+	return stmt.Colon
+}
+
+func (stmt *CaseStmt) stmtNode() {}
