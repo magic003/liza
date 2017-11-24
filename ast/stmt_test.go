@@ -469,8 +469,8 @@ var stmtTestCases = []struct {
 		},
 	},
 	{
-		desc: "CaseStmt",
-		stmt: &CaseStmt{
+		desc: "CaseClause",
+		stmt: &CaseClause{
 			Pattern: &Ident{
 				token: token.Token{
 					Type: token.IDENT,
@@ -500,8 +500,8 @@ var stmtTestCases = []struct {
 		},
 	},
 	{
-		desc: "CaseStmt",
-		stmt: &CaseStmt{
+		desc: "CaseClause",
+		stmt: &CaseClause{
 			Pattern: &Ident{
 				token: token.Token{
 					Type: token.IDENT,

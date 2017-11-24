@@ -207,7 +207,7 @@ type MatchStmt struct {
 	Match  token.Position // position of "match"
 	Expr   Expr
 	Lbrace token.Position // position of "{"
-	Cases  []*CaseStmt
+	Cases  []*CaseClause
 	Rbrace token.Position // position of "}"
 }
 
@@ -227,20 +227,20 @@ func (stmt *MatchStmt) End() token.Position {
 
 func (stmt *MatchStmt) stmtNode() {}
 
-// CaseStmt node represents a case clause in a match statement.
-type CaseStmt struct {
+// CaseClause node represents a case clause in a match statement.
+type CaseClause struct {
 	Pattern Expr           // matched pattern
 	Colon   token.Position // position of ":"
 	Body    []Stmt         // optional statement list
 }
 
 // Pos implementation for Node.
-func (stmt *CaseStmt) Pos() token.Position {
+func (stmt *CaseClause) Pos() token.Position {
 	return stmt.Pattern.Pos()
 }
 
 // End implementation for Node.
-func (stmt *CaseStmt) End() token.Position {
+func (stmt *CaseClause) End() token.Position {
 	if n := len(stmt.Body); n > 0 {
 		return stmt.Body[n-1].End()
 	}
@@ -248,4 +248,4 @@ func (stmt *CaseStmt) End() token.Position {
 	return stmt.Colon
 }
 
-func (stmt *CaseStmt) stmtNode() {}
+func (stmt *CaseClause) stmtNode() {}
