@@ -78,6 +78,35 @@ var declTestCases = []struct {
 			Column:   46 + 5,
 		},
 	},
+	{
+		desc: "PackageDecl",
+		decl: &PackageDecl{
+			Package: token.Position{
+				Filename: "test.lz",
+				Line:     1,
+				Column:   0,
+			},
+			Name: token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     1,
+					Column:   8,
+				},
+				Content: "hello",
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     1,
+			Column:   0,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     1,
+			Column:   8 + 5,
+		},
+	},
 }
 
 func TestDecl(t *testing.T) {

@@ -48,3 +48,25 @@ func (decl *VarDecl) End() token.Position {
 }
 
 func (decl *VarDecl) declNode() {}
+
+// PackageDecl node represents a package declaration.
+type PackageDecl struct {
+	Package token.Position // position of "package"
+	Name    token.Token    // token of package name
+}
+
+// Pos implementation for Node.
+func (decl *PackageDecl) Pos() token.Position {
+	return decl.Package
+}
+
+// End implementation for Node.
+func (decl *PackageDecl) End() token.Position {
+	return token.Position{
+		Filename: decl.Name.Position.Filename,
+		Line:     decl.Name.Position.Line,
+		Column:   decl.Name.Position.Column + len(decl.Name.Content),
+	}
+}
+
+func (decl *PackageDecl) declNode() {}
