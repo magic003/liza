@@ -70,3 +70,59 @@ func (decl *PackageDecl) End() token.Position {
 }
 
 func (decl *PackageDecl) declNode() {}
+
+// ImportDecl node represents an import declaration.
+type ImportDecl struct {
+	Import token.Position // position of "import"
+	Path   *ImportPath
+	As     *token.Position // optional position of "as"
+	Alias  *token.Token    // optional alias
+}
+
+// Pos implementation for Node.
+func (decl *ImportDecl) Pos() token.Position {
+	return decl.Import
+}
+
+// End implementation for Node.
+func (decl *ImportDecl) End() token.Position {
+	if decl.Alias != nil {
+		return token.Position{
+			Filename: decl.Alias.Position.Filename,
+			Line:     decl.Alias.Position.Line,
+			Column:   decl.Alias.Position.Column + len(decl.Alias.Content),
+		}
+	}
+
+	return decl.Path.End()
+}
+
+func (decl *ImportDecl) declNode() {}
+
+// ImportPath node represents an import path in an import declaration.
+type ImportPath struct {
+	LibraryName *token.Token  // external library name; nil if it's an internal path
+	Path        []token.Token // package name path
+}
+
+// Pos implementation for Node.
+func (path *ImportPath) Pos() token.Position {
+	if path.LibraryName != nil {
+		return path.LibraryName.Position
+	}
+
+	return path.Path[0].Position // the path must have at least 1 package
+}
+
+// End implementation for Node.
+func (path *ImportPath) End() token.Position {
+	n := len(path.Path)
+	lastPkg := path.Path[n-1]
+	return token.Position{
+		Filename: lastPkg.Position.Filename,
+		Line:     lastPkg.Position.Line,
+		Column:   lastPkg.Position.Column + len(lastPkg.Content),
+	}
+}
+
+func (path *ImportPath) declNode() {}
