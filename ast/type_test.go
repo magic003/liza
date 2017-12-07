@@ -15,7 +15,7 @@ var typeTestCases = []struct {
 	{
 		desc: "BasicType",
 		typeNode: &BasicType{
-			Ident: token.Token{
+			Ident: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -39,7 +39,7 @@ var typeTestCases = []struct {
 	{
 		desc: "SelectorType",
 		typeNode: &SelectorType{
-			Package: token.Token{
+			Package: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -48,7 +48,7 @@ var typeTestCases = []struct {
 				},
 				Content: "testpackage",
 			},
-			Sel: token.Token{
+			Sel: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -78,7 +78,7 @@ var typeTestCases = []struct {
 				Column:   26,
 			},
 			Elt: &BasicType{
-				Ident: token.Token{
+				Ident: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",

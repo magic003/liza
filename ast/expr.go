@@ -12,7 +12,7 @@ type Expr interface {
 
 // Ident is a node represents an identifier.
 type Ident struct {
-	token token.Token // identifier token
+	token *token.Token // identifier token
 }
 
 // Pos implementation for Node.
@@ -33,7 +33,7 @@ func (ident *Ident) exprNode() {}
 
 // BasicLit is a node represents a literal of basic type.
 type BasicLit struct {
-	token token.Token // basic literal token
+	token *token.Token // basic literal token
 }
 
 // Pos implementation for Node.
@@ -231,8 +231,8 @@ func (call *CallExpr) exprNode() {}
 
 // UnaryExpr node represents an unary expression.
 type UnaryExpr struct {
-	Op token.Token // operator
-	X  Expr        // operand
+	Op *token.Token // operator
+	X  Expr         // operand
 }
 
 // Pos implementation for Node.
@@ -249,9 +249,9 @@ func (unary *UnaryExpr) exprNode() {}
 
 // BinaryExpr node represents a binary expression.
 type BinaryExpr struct {
-	X  Expr        // left operand
-	Op token.Token // operator
-	Y  Expr        // right operand
+	X  Expr         // left operand
+	Op *token.Token // operator
+	Y  Expr         // right operand
 }
 
 // Pos implementation for Node.

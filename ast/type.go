@@ -12,7 +12,7 @@ type Type interface {
 
 // BasicType node represents a basic type provided by the language.
 type BasicType struct {
-	Ident token.Token // identifier for a basic type
+	Ident *token.Token // identifier for a basic type
 }
 
 // Pos implementation for Node.
@@ -33,8 +33,8 @@ func (basic *BasicType) typeNode() {}
 
 // SelectorType node represents a type defined in a package.
 type SelectorType struct {
-	Package token.Token // package identifier
-	Sel     token.Token //  type selector
+	Package *token.Token // package identifier
+	Sel     *token.Token //  type selector
 }
 
 // Pos implementation for Node.

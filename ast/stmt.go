@@ -46,8 +46,8 @@ func (stmt *ExprStmt) stmtNode() {}
 
 // IncDecStmt node represents an increasement or decreasement statement.
 type IncDecStmt struct {
-	Expr Expr        // expression
-	Op   token.Token // INC or DEC
+	Expr Expr         // expression
+	Op   *token.Token // INC or DEC
 }
 
 // Pos implementation for Node.
@@ -69,7 +69,7 @@ func (stmt *IncDecStmt) stmtNode() {}
 // AssignStmt node represents an assignment statement.
 type AssignStmt struct {
 	LHS    Expr
-	Assign token.Token // assignment token
+	Assign *token.Token // assignment token
 	RHS    Expr
 }
 
@@ -87,8 +87,8 @@ func (stmt *AssignStmt) stmtNode() {}
 
 // ReturnStmt node represents a return statement.
 type ReturnStmt struct {
-	Return token.Token // position of "return"
-	Value  Expr        // returned value expression, optional
+	Return *token.Token // position of "return"
+	Value  Expr         // returned value expression, optional
 }
 
 // Pos implementation for Node.
@@ -113,7 +113,7 @@ func (stmt *ReturnStmt) stmtNode() {}
 
 // BranchStmt node represents a break or continue statement.
 type BranchStmt struct {
-	Tok token.Token // keyword token (break, continue)
+	Tok *token.Token // keyword token (break, continue)
 }
 
 // Pos implementation for Node.

@@ -13,7 +13,7 @@ type Decl interface {
 // ConstDecl node represents a constant declaration.
 type ConstDecl struct {
 	ConstPos token.Position // position of const
-	Ident    token.Token    // constant identifier
+	Ident    *token.Token   // constant identifier
 	Type     Type           // optional constant type
 	Value    Expr           // constant value
 }
@@ -32,9 +32,9 @@ func (decl *ConstDecl) declNode() {}
 
 // VarDecl node represents a variable declaration.
 type VarDecl struct {
-	Ident token.Token // variable identifier
-	Type  Type        // optional constant type
-	Value Expr        // variable initial value
+	Ident *token.Token // variable identifier
+	Type  Type         // optional constant type
+	Value Expr         // variable initial value
 }
 
 // Pos implementation for Node.
@@ -52,7 +52,7 @@ func (decl *VarDecl) declNode() {}
 // PackageDecl node represents a package declaration.
 type PackageDecl struct {
 	Package token.Position // position of "package"
-	Name    token.Token    // token of package name
+	Name    *token.Token   // token of package name
 }
 
 // Pos implementation for Node.
@@ -101,8 +101,8 @@ func (decl *ImportDecl) declNode() {}
 
 // ImportPath node represents an import path in an import declaration.
 type ImportPath struct {
-	LibraryName *token.Token  // external library name; nil if it's an internal path
-	Path        []token.Token // package name path
+	LibraryName *token.Token   // external library name; nil if it's an internal path
+	Path        []*token.Token // package name path
 }
 
 // Pos implementation for Node.

@@ -21,7 +21,7 @@ var declTestCases = []struct {
 				Column:   26,
 			},
 			Value: &BasicLit{
-				token: token.Token{
+				token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -46,7 +46,7 @@ var declTestCases = []struct {
 	{
 		desc: "VarDecl",
 		decl: &VarDecl{
-			Ident: token.Token{
+			Ident: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -56,7 +56,7 @@ var declTestCases = []struct {
 				Content: "testVar",
 			},
 			Value: &BasicLit{
-				token: token.Token{
+				token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -86,7 +86,7 @@ var declTestCases = []struct {
 				Line:     1,
 				Column:   0,
 			},
-			Name: token.Token{
+			Name: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -145,7 +145,7 @@ var declTestCases = []struct {
 				Column:   0,
 			},
 			Path: &ImportPath{
-				Path: []token.Token{
+				Path: []*token.Token{
 					{
 						Type: token.IDENT,
 						Position: token.Position{
@@ -181,7 +181,7 @@ var declTestCases = []struct {
 				},
 				Content: "external",
 			},
-			Path: []token.Token{
+			Path: []*token.Token{
 				{
 					Type: token.IDENT,
 					Position: token.Position{
@@ -216,7 +216,7 @@ var declTestCases = []struct {
 	{
 		desc: "ImportPath without library name",
 		decl: &ImportPath{
-			Path: []token.Token{
+			Path: []*token.Token{
 				{
 					Type: token.IDENT,
 					Position: token.Position{

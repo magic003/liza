@@ -21,7 +21,7 @@ var fileTestCases = []struct {
 					Line:     1,
 					Column:   0,
 				},
-				Name: token.Token{
+				Name: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -52,7 +52,7 @@ var fileTestCases = []struct {
 					Line:     1,
 					Column:   0,
 				},
-				Name: token.Token{
+				Name: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -70,7 +70,7 @@ var fileTestCases = []struct {
 						Column:   26,
 					},
 					Value: &BasicLit{
-						token: token.Token{
+						token: &token.Token{
 							Type: token.INT,
 							Position: token.Position{
 								Filename: "test.lz",
