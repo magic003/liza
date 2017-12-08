@@ -73,3 +73,49 @@ func (p *Parser) parsePackageDecl() *ast.PackageDecl {
 		Name:    name,
 	}
 }
+
+func (p *Parser) parseImportDecl() *ast.ImportDecl {
+	importPos := p.expect(token.IMPORT).Position
+	path := p.parseImportPath()
+
+	node := &ast.ImportDecl{
+		Import: importPos,
+		Path:   path,
+	}
+	if p.tok.Type == token.AS {
+		asPos := p.expect(token.AS).Position
+		alias := p.expect(token.IDENT)
+
+		node.As = &asPos
+		node.Alias = alias
+	}
+	p.expect(token.NEWLINE)
+
+	return node
+}
+
+func (p *Parser) parseImportPath() *ast.ImportPath {
+	var (
+		libraryName *token.Token
+		path        []*token.Token
+	)
+
+	ident := p.expect(token.IDENT)
+	if p.tok.Type == token.DOUBLECOLON {
+		libraryName = ident
+		p.expect(token.DOUBLECOLON)
+		ident = p.expect(token.IDENT)
+	}
+	path = append(path, ident)
+
+	for p.tok.Type == token.DIV {
+		p.expect(token.DIV)
+		ident = p.expect(token.IDENT)
+		path = append(path, ident)
+	}
+
+	return &ast.ImportPath{
+		LibraryName: libraryName,
+		Path:        path,
+	}
+}
