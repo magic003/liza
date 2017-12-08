@@ -178,6 +178,9 @@ scanAgain:
 			if l.ch == '=' {
 				l.next()
 				return &token.Token{Type: token.DEFINE, Position: pos, Content: string(l.src[startOffset:l.offset])}
+			} else if l.ch == ':' {
+				l.next()
+				return &token.Token{Type: token.DOUBLECOLON, Position: pos, Content: string(l.src[startOffset:l.offset])}
 			}
 			// unexpected character, will return error later
 		case '(':

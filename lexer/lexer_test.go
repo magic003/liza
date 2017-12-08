@@ -512,8 +512,10 @@ var tokens = []*token.Token{
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.RBRACE, Content: "}"},
 	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.DOUBLECOLON, Content: "::"},
 
 	// Keywords
+	{Type: token.AS, Content: "as"},
 	{Type: token.BREAK, Content: "break"},
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.CLASS, Content: "class"},

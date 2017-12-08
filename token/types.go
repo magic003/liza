@@ -71,31 +71,33 @@ const (
 	COMMA  // ,
 	PERIOD // .
 
-	RPAREN // )
-	RBRACK // ]
-	RBRACE // }
+	RPAREN      // )
+	RBRACK      // ]
+	RBRACE      // }
+	DOUBLECOLON // ::
 	operatorEnd
 
 	keywordBeg
 	// Keywords
+	AS
 	BREAK
 	CLASS
 	CONST
 	CONTINUE
-	ELSE
 
+	ELSE
 	ENUM
 	FOR
 	FUN
 	IF
-	IMPLEMENTS
 
+	IMPLEMENTS
 	IMPORT
 	INTERFACE
 	MATCH
 	PACKAGE
-	PUBLIC
 
+	PUBLIC
 	RETURN
 	keywordEnd
 )
@@ -158,28 +160,30 @@ var types = [...]string{
 	COMMA:  ",",
 	PERIOD: ".",
 
-	RPAREN: ")",
-	RBRACK: "]",
-	RBRACE: "}",
+	RPAREN:      ")",
+	RBRACK:      "]",
+	RBRACE:      "}",
+	DOUBLECOLON: "::",
 
+	AS:       "as",
 	BREAK:    "break",
 	CLASS:    "class",
 	CONST:    "const",
 	CONTINUE: "continue",
-	ELSE:     "else",
 
-	ENUM:       "enum",
-	FOR:        "for",
-	FUN:        "fun",
-	IF:         "if",
+	ELSE: "else",
+	ENUM: "enum",
+	FOR:  "for",
+	FUN:  "fun",
+	IF:   "if",
+
 	IMPLEMENTS: "implements",
+	IMPORT:     "import",
+	INTERFACE:  "interface",
+	MATCH:      "match",
+	PACKAGE:    "package",
 
-	IMPORT:    "import",
-	INTERFACE: "interface",
-	MATCH:     "match",
-	PACKAGE:   "package",
-	PUBLIC:    "public",
-
+	PUBLIC: "public",
 	RETURN: "return",
 }
 
