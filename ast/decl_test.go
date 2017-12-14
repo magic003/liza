@@ -341,6 +341,60 @@ var declTestCases = []struct {
 			Column:   23,
 		},
 	},
+	{
+		desc: "ClassDecl without visibility",
+		decl: &ClassDecl{
+			Class: token.Position{
+				Filename: "test.lz",
+				Line:     3,
+				Column:   1,
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     30,
+				Column:   1,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   1,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     30,
+			Column:   2,
+		},
+	},
+	{
+		desc: "ClassDecl with visibility",
+		decl: &ClassDecl{
+			Visibility: &token.Token{
+				Type: token.PUBLIC,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     3,
+					Column:   1,
+				},
+				Content: "public",
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     30,
+				Column:   1,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   1,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     30,
+			Column:   2,
+		},
+	},
 }
 
 func TestDecl(t *testing.T) {

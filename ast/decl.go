@@ -170,3 +170,35 @@ func (param *ParameterDef) End() token.Position {
 }
 
 func (param *ParameterDef) declNode() {}
+
+// ClassDecl node represents a class declaration.
+type ClassDecl struct {
+	Visibility *token.Token   // optional visibility
+	Class      token.Position // position of class
+	Name       *token.Token
+	Implements []*SelectorType
+	Lbrace     token.Position
+	Consts     []*ConstDecl
+	Vars       []*VarDecl
+	Methods    []*FuncDecl
+	Rbrace     token.Position
+}
+
+// Pos implementation for Node.
+func (decl *ClassDecl) Pos() token.Position {
+	if decl.Visibility != nil {
+		return decl.Visibility.Position
+	}
+	return decl.Class
+}
+
+// End implementation for Node.
+func (decl *ClassDecl) End() token.Position {
+	return token.Position{
+		Filename: decl.Rbrace.Filename,
+		Line:     decl.Rbrace.Line,
+		Column:   decl.Rbrace.Column + 1,
+	}
+}
+
+func (decl *ClassDecl) declNode() {}
