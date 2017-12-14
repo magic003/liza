@@ -202,3 +202,60 @@ func (decl *ClassDecl) End() token.Position {
 }
 
 func (decl *ClassDecl) declNode() {}
+
+// InterfaceDecl node represents an interface declaration.
+type InterfaceDecl struct {
+	Visibility *token.Token   // optional visibility
+	Interface  token.Position // position of interface
+	Lbrace     token.Position
+	Methods    []*FuncDef
+	Rbrace     token.Position
+}
+
+// Pos implementation for Node.
+func (decl *InterfaceDecl) Pos() token.Position {
+	if decl.Visibility != nil {
+		return decl.Visibility.Position
+	}
+	return decl.Interface
+}
+
+// End implementation for Node.
+func (decl *InterfaceDecl) End() token.Position {
+	return token.Position{
+		Filename: decl.Rbrace.Filename,
+		Line:     decl.Rbrace.Line,
+		Column:   decl.Rbrace.Column + 1,
+	}
+}
+
+func (decl *InterfaceDecl) declNode() {}
+
+// FuncDef node represents a function definition.
+type FuncDef struct {
+	Fun        token.Position // position of fun
+	Name       *token.Token
+	Lparen     token.Position
+	Params     []*ParameterDef
+	Rparen     token.Position
+	ReturnType Type // return type; nil if it returns nothing
+}
+
+// Pos implementation for Node.
+func (def *FuncDef) Pos() token.Position {
+	return def.Fun
+}
+
+// End implementation for Node.
+func (def *FuncDef) End() token.Position {
+	if def.ReturnType != nil {
+		return def.ReturnType.End()
+	}
+	return token.Position{
+		Filename: def.Rparen.Filename,
+		Line:     def.Rparen.Line,
+		Column:   def.Rparen.Column + 1,
+	}
+}
+
+func (def *FuncDef) declNode() {}

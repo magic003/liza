@@ -395,6 +395,116 @@ var declTestCases = []struct {
 			Column:   2,
 		},
 	},
+	{
+		desc: "InterfaceDecl without visibility",
+		decl: &InterfaceDecl{
+			Interface: token.Position{
+				Filename: "test.lz",
+				Line:     3,
+				Column:   1,
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     30,
+				Column:   1,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   1,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     30,
+			Column:   2,
+		},
+	},
+	{
+		desc: "InterfaceDecl with visibility",
+		decl: &InterfaceDecl{
+			Visibility: &token.Token{
+				Type: token.PUBLIC,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     3,
+					Column:   1,
+				},
+				Content: "public",
+			},
+			Rbrace: token.Position{
+				Filename: "test.lz",
+				Line:     30,
+				Column:   1,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   1,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     30,
+			Column:   2,
+		},
+	},
+	{
+		desc: "FuncDef without return type",
+		decl: &FuncDef{
+			Fun: token.Position{
+				Filename: "test.lz",
+				Line:     3,
+				Column:   4,
+			},
+			Rparen: token.Position{
+				Filename: "test.lz",
+				Line:     3,
+				Column:   55,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   4,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   56,
+		},
+	},
+	{
+		desc: "FuncDef with return type",
+		decl: &FuncDef{
+			Fun: token.Position{
+				Filename: "test.lz",
+				Line:     3,
+				Column:   4,
+			},
+			ReturnType: &BasicType{
+				Ident: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     3,
+						Column:   20,
+					},
+					Content: "int",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   4,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   23,
+		},
+	},
 }
 
 func TestDecl(t *testing.T) {
