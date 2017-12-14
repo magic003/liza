@@ -64,7 +64,7 @@ var fileTestCases = []struct {
 			},
 			Decls: []Decl{
 				&ConstDecl{
-					ConstPos: token.Position{
+					Const: token.Position{
 						Filename: "test.lz",
 						Line:     10,
 						Column:   26,

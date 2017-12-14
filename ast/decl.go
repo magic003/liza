@@ -13,7 +13,7 @@ type Decl interface {
 // ConstDecl node represents a constant declaration.
 type ConstDecl struct {
 	Visibility *token.Token   // optional visibility
-	ConstPos   token.Position // position of const
+	Const      token.Position // position of const
 	Ident      *token.Token   // constant identifier
 	Type       Type           // optional constant type
 	Value      Expr           // constant value
@@ -24,7 +24,7 @@ func (decl *ConstDecl) Pos() token.Position {
 	if decl.Visibility != nil {
 		return decl.Visibility.Position
 	}
-	return decl.ConstPos
+	return decl.Const
 }
 
 // End implementation for Node.
