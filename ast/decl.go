@@ -12,14 +12,18 @@ type Decl interface {
 
 // ConstDecl node represents a constant declaration.
 type ConstDecl struct {
-	ConstPos token.Position // position of const
-	Ident    *token.Token   // constant identifier
-	Type     Type           // optional constant type
-	Value    Expr           // constant value
+	Visibility *token.Token   // optional visibility
+	ConstPos   token.Position // position of const
+	Ident      *token.Token   // constant identifier
+	Type       Type           // optional constant type
+	Value      Expr           // constant value
 }
 
 // Pos implementation for Node.
 func (decl *ConstDecl) Pos() token.Position {
+	if decl.Visibility != nil {
+		return decl.Visibility.Position
+	}
 	return decl.ConstPos
 }
 
@@ -32,13 +36,17 @@ func (decl *ConstDecl) declNode() {}
 
 // VarDecl node represents a variable declaration.
 type VarDecl struct {
-	Ident *token.Token // variable identifier
-	Type  Type         // optional constant type
-	Value Expr         // variable initial value
+	Visibility *token.Token // optional visibility
+	Ident      *token.Token // variable identifier
+	Type       Type         // optional constant type
+	Value      Expr         // variable initial value
 }
 
 // Pos implementation for Node.
 func (decl *VarDecl) Pos() token.Position {
+	if decl.Visibility != nil {
+		return decl.Visibility.Position
+	}
 	return decl.Ident.Position
 }
 

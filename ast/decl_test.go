@@ -13,7 +13,7 @@ var declTestCases = []struct {
 	expectedEnd token.Position
 }{
 	{
-		desc: "ConstDecl",
+		desc: "ConstDecl without visibility",
 		decl: &ConstDecl{
 			ConstPos: token.Position{
 				Filename: "test.lz",
@@ -44,7 +44,42 @@ var declTestCases = []struct {
 		},
 	},
 	{
-		desc: "VarDecl",
+		desc: "ConstDecl with visibility",
+		decl: &ConstDecl{
+			Visibility: &token.Token{
+				Type: token.PUBLIC,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "public",
+			},
+			Value: &BasicLit{
+				token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   46,
+					},
+					Content: "12345",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   46 + 5,
+		},
+	},
+	{
+		desc: "VarDecl without visibility",
 		decl: &VarDecl{
 			Ident: &token.Token{
 				Type: token.IDENT,
@@ -54,6 +89,41 @@ var declTestCases = []struct {
 					Column:   26,
 				},
 				Content: "testVar",
+			},
+			Value: &BasicLit{
+				token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     10,
+						Column:   46,
+					},
+					Content: "12345",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   46 + 5,
+		},
+	},
+	{
+		desc: "VarDecl with visibility",
+		decl: &VarDecl{
+			Visibility: &token.Token{
+				Type: token.PUBLIC,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
+				},
+				Content: "public",
 			},
 			Value: &BasicLit{
 				token: &token.Token{
