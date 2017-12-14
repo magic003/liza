@@ -248,6 +248,99 @@ var declTestCases = []struct {
 			Column:   19 + 5,
 		},
 	},
+	{
+		desc: "FuncDecl without visibility",
+		decl: &FuncDecl{
+			Fun: token.Position{
+				Filename: "test.lz",
+				Line:     3,
+				Column:   1,
+			},
+			Body: &BlockStmt{
+				Rbrace: token.Position{
+					Filename: "test.lz",
+					Line:     23,
+					Column:   1,
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   1,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     23,
+			Column:   2,
+		},
+	},
+	{
+		desc: "FuncDecl with visibility",
+		decl: &FuncDecl{
+			Visibility: &token.Token{
+				Type: token.PUBLIC,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     3,
+					Column:   1,
+				},
+				Content: "public",
+			},
+			Body: &BlockStmt{
+				Rbrace: token.Position{
+					Filename: "test.lz",
+					Line:     23,
+					Column:   1,
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   1,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     23,
+			Column:   2,
+		},
+	},
+	{
+		desc: "ParameterDef",
+		decl: &ParameterDef{
+			Name: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: "test.lz",
+					Line:     3,
+					Column:   15,
+				},
+				Content: "test",
+			},
+			Type: &BasicType{
+				Ident: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: "test.lz",
+						Line:     3,
+						Column:   20,
+					},
+					Content: "int",
+				},
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   15,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     3,
+			Column:   23,
+		},
+	},
 }
 
 func TestDecl(t *testing.T) {

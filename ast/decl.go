@@ -126,3 +126,47 @@ func (path *ImportPath) End() token.Position {
 }
 
 func (path *ImportPath) declNode() {}
+
+// FuncDecl node represents a function declaration.
+type FuncDecl struct {
+	Visibility *token.Token    // optional visibility token
+	Fun        token.Position  // position of fun
+	Name       *token.Token    // function name
+	Params     []*ParameterDef // parameters
+	ReturnType Type            // return type; nil if it returns nothing
+	Body       *BlockStmt      // function body
+}
+
+// Pos implementation for Node.
+func (decl *FuncDecl) Pos() token.Position {
+	if decl.Visibility != nil {
+		return decl.Visibility.Position
+	}
+
+	return decl.Fun
+}
+
+// End implementation for Node.
+func (decl *FuncDecl) End() token.Position {
+	return decl.Body.End()
+}
+
+func (decl *FuncDecl) declNode() {}
+
+// ParameterDef node represents a parameter definition.
+type ParameterDef struct {
+	Name *token.Token
+	Type Type
+}
+
+// Pos implementation for Node.
+func (param *ParameterDef) Pos() token.Position {
+	return param.Name.Position
+}
+
+// End implementation for Node.
+func (param *ParameterDef) End() token.Position {
+	return param.Type.End()
+}
+
+func (param *ParameterDef) declNode() {}
