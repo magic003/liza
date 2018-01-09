@@ -13,6 +13,31 @@ var declTestCases = []struct {
 	expectedEnd token.Position
 }{
 	{
+		desc: "BadDecl",
+		decl: &BadDecl{
+			From: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
+			To: token.Position{
+				Filename: "test.lz",
+				Line:     30,
+				Column:   6,
+			},
+		},
+		expectedPos: token.Position{
+			Filename: "test.lz",
+			Line:     10,
+			Column:   26,
+		},
+		expectedEnd: token.Position{
+			Filename: "test.lz",
+			Line:     30,
+			Column:   6,
+		},
+	},
+	{
 		desc: "ConstDecl without visibility",
 		decl: &ConstDecl{
 			Const: token.Position{

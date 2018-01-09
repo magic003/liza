@@ -10,6 +10,24 @@ type Decl interface {
 	declNode()
 }
 
+// BadDecl node represents declarations containing syntax errors for which no declaration node can be created.
+type BadDecl struct {
+	From token.Position
+	To   token.Position
+}
+
+// Pos implementation for Node.
+func (decl *BadDecl) Pos() token.Position {
+	return decl.From
+}
+
+// End implementation for Node.
+func (decl *BadDecl) End() token.Position {
+	return decl.To
+}
+
+func (decl *BadDecl) declNode() {}
+
 // ConstDecl node represents a constant declaration.
 type ConstDecl struct {
 	Visibility *token.Token   // optional visibility
