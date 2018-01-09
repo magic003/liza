@@ -55,10 +55,32 @@ func (p *Parser) handleErr(pos token.Position, msg string) {
 func (p *Parser) expect(tt token.Type) *token.Token {
 	currentTok := p.tok
 	if currentTok.Type != tt {
-		p.handleErr(currentTok.Position, "expected "+"'"+tt.String()+"' found '"+currentTok.Type.String()+"'")
+		p.errorExpected(currentTok.Position, "<"+tt.String()+">")
 	}
 	p.next() // make progress
 	return currentTok
+}
+
+func (p *Parser) errorExpected(pos token.Position, expected string) {
+	msg := "expected " + expected
+	if pos == p.tok.Position {
+		// error happens at the current position. make it more specific
+		msg += ", found <" + p.tok.Type.String() + "> " + p.tok.Content
+	}
+
+	p.handleErr(pos, msg)
+}
+
+func (p *Parser) syncTopLevelDecl() {
+	for {
+		switch p.tok.Type {
+		case token.PUBLIC, token.CONST, token.CLASS, token.INTERFACE:
+			return
+		case token.EOF:
+			return
+		}
+		p.next()
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -117,5 +139,29 @@ func (p *Parser) parseImportPath() *ast.ImportPath {
 	return &ast.ImportPath{
 		LibraryName: libraryName,
 		Path:        path,
+	}
+}
+
+func (p *Parser) parseTopLevelDecl() ast.Decl {
+	var visibility *token.Token
+	if p.tok.Type == token.PUBLIC {
+		visibility = p.expect(token.PUBLIC)
+	}
+
+	switch p.tok.Type {
+	case token.CONST:
+		return p.parseConstDecl(visibility)
+	case token.CLASS:
+		return p.parseClassDecl(visibility)
+	case token.INTERFACE:
+		return p.parseInterfaceDecl(visibility)
+	default:
+		pos := p.tok.Position
+		p.errorExpected(p.tok.Position, "declaration")
+		p.syncTopLevelDecl()
+		return &ast.BadDecl{
+			From: pos,
+			To:   p.tok.Position,
+		}
 	}
 }
