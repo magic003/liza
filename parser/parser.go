@@ -165,3 +165,43 @@ func (p *Parser) parseTopLevelDecl() ast.Decl {
 		}
 	}
 }
+
+func (p *Parser) parseConstDecl(visibility *token.Token) *ast.ConstDecl {
+	constPos := p.expect(token.CONST).Position
+	ident := p.expect(token.IDENT)
+	var tp ast.Type
+	if p.tok.Type != token.DEFINE {
+		tp = p.parseType()
+	}
+	p.expect(token.DEFINE)
+	value := p.parseExpr()
+	return &ast.ConstDecl{
+		Visibility: visibility,
+		Const:      constPos,
+		Ident:      ident,
+		Type:       tp,
+		Value:      value,
+	}
+}
+
+func (p *Parser) parseClassDecl(visibility *token.Token) *ast.ClassDecl {
+	return nil
+}
+
+func (p *Parser) parseInterfaceDecl(visibility *token.Token) *ast.InterfaceDecl {
+	return nil
+}
+
+// ---------------------------------------------------------------------------
+// Expression
+
+func (p *Parser) parseExpr() ast.Expr {
+	return nil
+}
+
+// ---------------------------------------------------------------------------
+// Type
+
+func (p *Parser) parseType() ast.Type {
+	return nil
+}
