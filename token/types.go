@@ -74,6 +74,7 @@ const (
 	RPAREN      // )
 	RBRACK      // ]
 	RBRACE      // }
+	COLON       // :
 	DOUBLECOLON // ::
 	operatorEnd
 
@@ -163,6 +164,7 @@ var types = [...]string{
 	RPAREN:      ")",
 	RBRACK:      "]",
 	RBRACE:      "}",
+	COLON:       ":",
 	DOUBLECOLON: "::",
 
 	AS:       "as",

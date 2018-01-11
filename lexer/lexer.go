@@ -181,8 +181,9 @@ scanAgain:
 			} else if l.ch == ':' {
 				l.next()
 				return &token.Token{Type: token.DOUBLECOLON, Position: pos, Content: string(l.src[startOffset:l.offset])}
+			} else {
+				return &token.Token{Type: token.COLON, Position: pos, Content: ":"}
 			}
-			// unexpected character, will return error later
 		case '(':
 			return &token.Token{Type: token.LPAREN, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case ')':

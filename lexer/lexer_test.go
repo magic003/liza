@@ -512,6 +512,7 @@ var tokens = []*token.Token{
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.RBRACE, Content: "}"},
 	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.COLON, Content: ":"},
 	{Type: token.DOUBLECOLON, Content: "::"},
 
 	// Keywords
@@ -753,25 +754,28 @@ var lines = []string{
 	")$\n",
 	"]$\n",
 	"}$\n",
+	":\n",
+	"::\n",
 
+	"as\n",
 	"break$\n",
 	"class\n",
 	"const\n",
 	"continue$\n",
-	"else\n",
 
+	"else\n",
 	"enum\n",
 	"for\n",
 	"fun\n",
 	"if\n",
-	"implements\n",
 
+	"implements\n",
 	"import\n",
 	"interface\n",
 	"match\n",
 	"package\n",
-	"public\n",
 
+	"public\n",
 	"return$\n",
 
 	"foo /*comment*/ /=",
@@ -862,7 +866,6 @@ var errors = []struct {
 }{
 	{"\a", token.ILLEGAL, []int{1}, "", []string{"illegal character U+0007"}},
 	{`#`, token.ILLEGAL, []int{1}, "", []string{"illegal character U+0023 '#'"}},
-	{`:`, token.ILLEGAL, []int{1}, "", []string{"illegal character U+003A ':'"}},
 	{`…`, token.ILLEGAL, []int{1}, "", []string{"illegal character U+2026 '…'"}},
 	{"0x", token.INT, []int{1}, "0x", []string{"illegal hexadecimal number"}},
 	{"0X", token.INT, []int{1}, "0X", []string{"illegal hexadecimal number"}},
