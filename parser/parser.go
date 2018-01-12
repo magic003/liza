@@ -175,6 +175,7 @@ func (p *Parser) parseConstDecl(visibility *token.Token) *ast.ConstDecl {
 	}
 	p.expect(token.DEFINE)
 	value := p.parseExpr()
+	p.expect(token.NEWLINE)
 	return &ast.ConstDecl{
 		Visibility: visibility,
 		Const:      constPos,
@@ -203,5 +204,72 @@ func (p *Parser) parseExpr() ast.Expr {
 // Type
 
 func (p *Parser) parseType() ast.Type {
-	return nil
+	switch p.tok.Type {
+	case token.LBRACK:
+		return p.parseArrayType()
+	case token.LBRACE:
+		return p.parseMapType()
+	case token.LPAREN:
+		return p.parseTupleType()
+	case token.IDENT:
+		return p.parseBasicOrSelectorType()
+	default:
+		// TODO record error, sync and return bad type node.
+		return nil
+	}
+}
+
+func (p *Parser) parseArrayType() *ast.ArrayType {
+	lbrack := p.expect(token.LBRACK).Position
+	rbrack := p.expect(token.RBRACK).Position
+	elt := p.parseType()
+	return &ast.ArrayType{
+		Lbrack: lbrack,
+		Rbrack: rbrack,
+		Elt:    elt,
+	}
+}
+
+func (p *Parser) parseMapType() *ast.MapType {
+	lbrace := p.expect(token.LBRACE).Position
+	key := p.parseType()
+	p.expect(token.COLON)
+	value := p.parseType()
+	rbrace := p.expect(token.RBRACE).Position
+	return &ast.MapType{
+		Lbrace: lbrace,
+		Key:    key,
+		Value:  value,
+		Rbrace: rbrace,
+	}
+}
+
+func (p *Parser) parseTupleType() *ast.TupleType {
+	lparen := p.expect(token.LPAREN).Position
+	var elts []ast.Type
+	for p.tok.Type != token.RPAREN && p.tok.Type != token.EOF {
+		elts = append(elts, p.parseType())
+	}
+	rparen := p.expect(token.RPAREN).Position
+	return &ast.TupleType{
+		Lparen: lparen,
+		Elts:   elts,
+		Rparen: rparen,
+	}
+}
+
+func (p *Parser) parseBasicOrSelectorType() ast.Type {
+	ident1 := p.expect(token.IDENT)
+	if p.tok.Type == token.PERIOD {
+		p.expect(token.PERIOD)
+		ident2 := p.expect(token.IDENT)
+		return &ast.SelectorType{
+			Package: ident1,
+			Sel:     ident2,
+		}
+	}
+
+	return &ast.BasicType{
+		Ident: ident1,
+	}
 }
