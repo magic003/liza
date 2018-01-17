@@ -249,6 +249,9 @@ func (p *Parser) parseTupleType() *ast.TupleType {
 	var elts []ast.Type
 	for p.tok.Type != token.RPAREN && p.tok.Type != token.EOF {
 		elts = append(elts, p.parseType())
+		if p.tok.Type != token.RPAREN {
+			p.expect(token.COMMA)
+		}
 	}
 	rparen := p.expect(token.RPAREN).Position
 	return &ast.TupleType{
