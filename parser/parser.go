@@ -190,7 +190,65 @@ func (p *Parser) parseClassDecl(visibility *token.Token) *ast.ClassDecl {
 }
 
 func (p *Parser) parseInterfaceDecl(visibility *token.Token) *ast.InterfaceDecl {
-	return nil
+	interfacePos := p.expect(token.INTERFACE).Position
+	name := p.expect(token.IDENT)
+	lbrace := p.expect(token.LBRACE).Position
+	var methods []*ast.FuncDef
+	for p.tok.Type == token.FUN {
+		methods = append(methods, p.parseFuncDef())
+	}
+	rbrace := p.expect(token.RBRACE).Position
+	return &ast.InterfaceDecl{
+		Visibility: visibility,
+		Interface:  interfacePos,
+		Name:       name,
+		Lbrace:     lbrace,
+		Methods:    methods,
+		Rbrace:     rbrace,
+	}
+}
+
+func (p *Parser) parseFuncDef() *ast.FuncDef {
+	funcDef := p.parseFuncSignature()
+	p.expect(token.NEWLINE)
+	return funcDef
+}
+
+func (p *Parser) parseFuncSignature() *ast.FuncDef {
+	fun := p.expect(token.FUN).Position
+	name := p.expect(token.IDENT)
+	lparen := p.expect(token.LPAREN).Position
+
+	var params []*ast.ParameterDef
+	for p.tok.Type != token.RPAREN && p.tok.Type != token.EOF {
+		params = append(params, p.parseParameterDef())
+		if p.tok.Type != token.RPAREN {
+			p.expect(token.COMMA)
+		}
+	}
+	rparen := p.expect(token.RPAREN).Position
+	var tp ast.Type
+	if p.tok.Type == token.COLON {
+		p.expect(token.COLON)
+		tp = p.parseType()
+	}
+	return &ast.FuncDef{
+		Fun:        fun,
+		Name:       name,
+		Lparen:     lparen,
+		Params:     params,
+		Rparen:     rparen,
+		ReturnType: tp,
+	}
+}
+
+func (p *Parser) parseParameterDef() *ast.ParameterDef {
+	ident := p.expect(token.IDENT)
+	tp := p.parseType()
+	return &ast.ParameterDef{
+		Name: ident,
+		Type: tp,
+	}
 }
 
 // ---------------------------------------------------------------------------

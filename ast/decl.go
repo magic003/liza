@@ -233,6 +233,7 @@ func (decl *ClassDecl) declNode() {}
 type InterfaceDecl struct {
 	Visibility *token.Token   // optional visibility
 	Interface  token.Position // position of interface
+	Name       *token.Token
 	Lbrace     token.Position
 	Methods    []*FuncDef
 	Rbrace     token.Position
