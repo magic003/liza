@@ -198,6 +198,7 @@ func (p *Parser) parseInterfaceDecl(visibility *token.Token) *ast.InterfaceDecl 
 		methods = append(methods, p.parseFuncDef())
 	}
 	rbrace := p.expect(token.RBRACE).Position
+	p.expect(token.NEWLINE)
 	return &ast.InterfaceDecl{
 		Visibility: visibility,
 		Interface:  interfacePos,
