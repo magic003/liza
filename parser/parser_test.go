@@ -587,6 +587,36 @@ var validInterfaceDeclTestCases = []struct {
 			},
 		},
 	},
+	{
+		desc: "interface declaration without methods",
+		src:  []byte("interface Test {}"),
+		expected: &ast.InterfaceDecl{
+			Interface: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Name: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   11,
+				},
+				Content: "Test",
+			},
+			Lbrace: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   16,
+			},
+			Rbrace: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   17,
+			},
+		},
+	},
 }
 
 func TestValidInterfaceDecl(t *testing.T) {
