@@ -256,7 +256,172 @@ func (p *Parser) parseParameterDef() *ast.ParameterDef {
 // Expression
 
 func (p *Parser) parseExpr() ast.Expr {
+	return p.parseBinaryExpr(lowestPrec)
+}
+
+func (p *Parser) parseBinaryExpr(prec int) ast.Expr {
+	x := p.parseUnaryExpr()
+	for {
+		currPrec := precedence(p.tok.Type)
+		if currPrec <= prec {
+			return x
+		}
+		op := p.expect(p.tok.Type)
+		y := p.parseBinaryExpr(currPrec)
+		x = &ast.BinaryExpr{X: x, Op: op, Y: y}
+	}
+}
+
+func (p *Parser) parseUnaryExpr() ast.Expr {
+	tp := p.tok.Type
+	if tp == token.SUB || tp == token.XOR || tp == token.NOT {
+		op := p.expect(tp)
+		x := p.parseUnaryExpr()
+		return &ast.UnaryExpr{Op: op, X: x}
+	}
+
+	return p.parsePrimaryExpr()
+}
+
+func (p *Parser) parsePrimaryExpr() ast.Expr {
+	x := p.parseOperand()
+
+	for {
+		switch p.tok.Type {
+		case token.PERIOD:
+			return p.parseSelectorExpr(x)
+		case token.LBRACK:
+			return p.parseIndexExpr(x)
+		case token.LPAREN:
+			return p.parseCallExpr(x)
+		}
+	}
+
+	return x
+}
+
+func (p *Parser) parseOperand() ast.Expr {
+	switch p.tok.Type {
+	case token.IDENT:
+		return p.parseIdent()
+	case token.INT, token.FLOAT, token.STRING:
+		tok := p.expect(p.tok.Type)
+		return &ast.BasicLit{Token: tok}
+	case token.LBRACK:
+		return p.parseArrayLit()
+	case token.LBRACE:
+		return p.parseMapLit()
+	case token.LPAREN:
+		// It could not tell it is a TupleLit or ParenExpr, so it always treats it as a TupleLit.
+		// The actual check will happen in the semantic analysis phase.
+		return p.parseTupleLit()
+	}
+
+	// TODO record error, sync and return BadExpr
 	return nil
+}
+
+func (p *Parser) parseArrayLit() *ast.ArrayLit {
+	lbrack := p.expect(token.LBRACK).Position
+	var elts []ast.Expr
+	for p.tok.Type != token.RBRACK && p.tok.Type != token.EOF {
+		elts = append(elts, p.parseExpr())
+		if p.tok.Type != token.RBRACK {
+			p.expect(token.COMMA)
+		}
+	}
+	rbrack := p.expect(token.RBRACK).Position
+	return &ast.ArrayLit{
+		Lbrack: lbrack,
+		Elts:   elts,
+		Rbrack: rbrack,
+	}
+}
+
+func (p *Parser) parseMapLit() *ast.MapLit {
+	lbrace := p.expect(token.LBRACE).Position
+	var elts []*ast.KeyValueExpr
+	for p.tok.Type != token.RBRACE && p.tok.Type != token.EOF {
+		elts = append(elts, p.parseKeyValueExpr())
+		if p.tok.Type != token.RBRACE {
+			p.expect(token.COMMA)
+		}
+	}
+	rbrace := p.expect(token.RBRACE).Position
+	return &ast.MapLit{
+		Lbrace: lbrace,
+		Elts:   elts,
+		Rbrace: rbrace,
+	}
+}
+
+func (p *Parser) parseKeyValueExpr() *ast.KeyValueExpr {
+	key := p.parseExpr()
+	colon := p.expect(token.COLON).Position
+	value := p.parseExpr()
+	return &ast.KeyValueExpr{
+		Key:   key,
+		Colon: colon,
+		Value: value,
+	}
+}
+
+func (p *Parser) parseTupleLit() *ast.TupleLit {
+	lparen := p.expect(token.LPAREN).Position
+	var elts []ast.Expr
+	for p.tok.Type != token.RPAREN && p.tok.Type != token.EOF {
+		elts = append(elts, p.parseExpr())
+		if p.tok.Type != token.RPAREN {
+			p.expect(token.COMMA)
+		}
+	}
+	rparen := p.expect(token.RPAREN).Position
+	return &ast.TupleLit{
+		Lparen: lparen,
+		Elts:   elts,
+		Rparen: rparen,
+	}
+}
+
+func (p *Parser) parseSelectorExpr(x ast.Expr) *ast.SelectorExpr {
+	p.expect(token.PERIOD)
+	sel := p.parseIdent()
+	return &ast.SelectorExpr{X: x, Sel: sel}
+}
+
+func (p *Parser) parseIdent() *ast.Ident {
+	ident := p.expect(token.IDENT)
+	return &ast.Ident{Token: ident}
+}
+
+func (p *Parser) parseIndexExpr(x ast.Expr) *ast.IndexExpr {
+	lbrack := p.expect(token.LBRACK).Position
+	index := p.parseExpr()
+	rbrack := p.expect(token.RBRACK).Position
+	return &ast.IndexExpr{
+		X:      x,
+		Lbrack: lbrack,
+		Index:  index,
+		Rbrack: rbrack,
+	}
+}
+
+func (p *Parser) parseCallExpr(x ast.Expr) *ast.CallExpr {
+	lparen := p.expect(token.LPAREN).Position
+	var args []ast.Expr
+	for p.tok.Type != token.RPAREN && p.tok.Type != token.EOF {
+		args = append(args, p.parseExpr())
+		if p.tok.Type != token.RPAREN {
+			p.expect(token.COMMA)
+		}
+	}
+	rparen := p.expect(token.RPAREN).Position
+	return &ast.CallExpr{
+		Fun:    x,
+		Lparen: lparen,
+		Args:   args,
+		Rparen: rparen,
+	}
 }
 
 // ---------------------------------------------------------------------------
