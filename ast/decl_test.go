@@ -46,7 +46,7 @@ var declTestCases = []struct {
 				Column:   26,
 			},
 			Value: &BasicLit{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -81,7 +81,7 @@ var declTestCases = []struct {
 				Content: "public",
 			},
 			Value: &BasicLit{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -116,7 +116,7 @@ var declTestCases = []struct {
 				Content: "testVar",
 			},
 			Value: &BasicLit{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -151,7 +151,7 @@ var declTestCases = []struct {
 				Content: "public",
 			},
 			Value: &BasicLit{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",

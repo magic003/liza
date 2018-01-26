@@ -70,7 +70,7 @@ var fileTestCases = []struct {
 						Column:   26,
 					},
 					Value: &BasicLit{
-						token: &token.Token{
+						Token: &token.Token{
 							Type: token.INT,
 							Position: token.Position{
 								Filename: "test.lz",

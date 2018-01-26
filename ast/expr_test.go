@@ -15,7 +15,7 @@ var exprTestCases = []struct {
 	{
 		desc: "Ident",
 		expr: &Ident{
-			token: &token.Token{
+			Token: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -39,7 +39,7 @@ var exprTestCases = []struct {
 	{
 		desc: "BasicLit",
 		expr: &BasicLit{
-			token: &token.Token{
+			Token: &token.Token{
 				Type: token.INT,
 				Position: token.Position{
 					Filename: "test.lz",
@@ -89,7 +89,7 @@ var exprTestCases = []struct {
 		desc: "KeyValueExpr",
 		expr: &KeyValueExpr{
 			Key: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -105,7 +105,7 @@ var exprTestCases = []struct {
 				Column:   36,
 			},
 			Value: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -206,7 +206,7 @@ var exprTestCases = []struct {
 		desc: "SelectorExpr",
 		expr: &SelectorExpr{
 			X: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -217,7 +217,7 @@ var exprTestCases = []struct {
 				},
 			},
 			Sel: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -243,7 +243,7 @@ var exprTestCases = []struct {
 		desc: "IndexExpr",
 		expr: &IndexExpr{
 			X: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -259,7 +259,7 @@ var exprTestCases = []struct {
 				Column:   33,
 			},
 			Index: &BasicLit{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.INT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -291,7 +291,7 @@ var exprTestCases = []struct {
 		expr: &CallExpr{
 			Fun: &SelectorExpr{
 				X: &Ident{
-					token: &token.Token{
+					Token: &token.Token{
 						Type: token.IDENT,
 						Position: token.Position{
 							Filename: "test.lz",
@@ -302,7 +302,7 @@ var exprTestCases = []struct {
 					},
 				},
 				Sel: &Ident{
-					token: &token.Token{
+					Token: &token.Token{
 						Type: token.IDENT,
 						Position: token.Position{
 							Filename: "test.lz",
@@ -348,7 +348,7 @@ var exprTestCases = []struct {
 				Content: "-",
 			},
 			X: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -374,7 +374,7 @@ var exprTestCases = []struct {
 		desc: "BinaryExpr",
 		expr: &BinaryExpr{
 			X: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -394,7 +394,7 @@ var exprTestCases = []struct {
 				Content: "+",
 			},
 			Y: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",

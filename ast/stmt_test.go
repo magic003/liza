@@ -26,7 +26,7 @@ var stmtTestCases = []struct {
 					Content: "testVar",
 				},
 				Value: &BasicLit{
-					token: &token.Token{
+					Token: &token.Token{
 						Type: token.INT,
 						Position: token.Position{
 							Filename: "test.lz",
@@ -55,7 +55,7 @@ var stmtTestCases = []struct {
 			Expr: &CallExpr{
 				Fun: &SelectorExpr{
 					X: &Ident{
-						token: &token.Token{
+						Token: &token.Token{
 							Type: token.IDENT,
 							Position: token.Position{
 								Filename: "test.lz",
@@ -66,7 +66,7 @@ var stmtTestCases = []struct {
 						},
 					},
 					Sel: &Ident{
-						token: &token.Token{
+						Token: &token.Token{
 							Type: token.IDENT,
 							Position: token.Position{
 								Filename: "test.lz",
@@ -104,7 +104,7 @@ var stmtTestCases = []struct {
 		desc: "IncDecStmt",
 		stmt: &IncDecStmt{
 			Expr: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -139,7 +139,7 @@ var stmtTestCases = []struct {
 		desc: "AssignStmt",
 		stmt: &AssignStmt{
 			LHS: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -159,7 +159,7 @@ var stmtTestCases = []struct {
 				Content: "=",
 			},
 			RHS: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -194,7 +194,7 @@ var stmtTestCases = []struct {
 				Content: "return",
 			},
 			Value: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -472,7 +472,7 @@ var stmtTestCases = []struct {
 		desc: "CaseClause",
 		stmt: &CaseClause{
 			Pattern: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -503,7 +503,7 @@ var stmtTestCases = []struct {
 		desc: "CaseClause",
 		stmt: &CaseClause{
 			Pattern: &Ident{
-				token: &token.Token{
+				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
@@ -530,7 +530,7 @@ var stmtTestCases = []struct {
 						Content: "return",
 					},
 					Value: &Ident{
-						token: &token.Token{
+						Token: &token.Token{
 							Type: token.IDENT,
 							Position: token.Position{
 								Filename: "test.lz",

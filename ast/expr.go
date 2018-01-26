@@ -12,20 +12,20 @@ type Expr interface {
 
 // Ident is a node represents an identifier.
 type Ident struct {
-	token *token.Token // identifier token
+	Token *token.Token // identifier token
 }
 
 // Pos implementation for Node.
 func (ident *Ident) Pos() token.Position {
-	return ident.token.Position
+	return ident.Token.Position
 }
 
 // End implementation for Node.
 func (ident *Ident) End() token.Position {
 	return token.Position{
-		Filename: ident.token.Position.Filename,
-		Line:     ident.token.Position.Line,
-		Column:   ident.token.Position.Column + len(ident.token.Content),
+		Filename: ident.Token.Position.Filename,
+		Line:     ident.Token.Position.Line,
+		Column:   ident.Token.Position.Column + len(ident.Token.Content),
 	}
 }
 
@@ -33,20 +33,20 @@ func (ident *Ident) exprNode() {}
 
 // BasicLit is a node represents a literal of basic type.
 type BasicLit struct {
-	token *token.Token // basic literal token
+	Token *token.Token // basic literal token
 }
 
 // Pos implementation for Node.
 func (lit *BasicLit) Pos() token.Position {
-	return lit.token.Position
+	return lit.Token.Position
 }
 
 // End implementation for Node.
 func (lit *BasicLit) End() token.Position {
 	return token.Position{
-		Filename: lit.token.Position.Filename,
-		Line:     lit.token.Position.Line,
-		Column:   lit.token.Position.Column + len(lit.token.Content),
+		Filename: lit.Token.Position.Filename,
+		Line:     lit.Token.Position.Line,
+		Column:   lit.Token.Position.Column + len(lit.Token.Content),
 	}
 }
 
