@@ -289,15 +289,15 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	for {
 		switch p.tok.Type {
 		case token.PERIOD:
-			return p.parseSelectorExpr(x)
+			x = p.parseSelectorExpr(x)
 		case token.LBRACK:
-			return p.parseIndexExpr(x)
+			x = p.parseIndexExpr(x)
 		case token.LPAREN:
-			return p.parseCallExpr(x)
+			x = p.parseCallExpr(x)
+		default:
+			return x
 		}
 	}
-
-	return x
 }
 
 func (p *Parser) parseOperand() ast.Expr {
