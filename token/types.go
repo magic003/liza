@@ -100,6 +100,7 @@ const (
 
 	PUBLIC
 	RETURN
+	VAR
 	keywordEnd
 )
 
@@ -187,6 +188,7 @@ var types = [...]string{
 
 	PUBLIC: "public",
 	RETURN: "return",
+	VAR:    "var",
 }
 
 func (ty Type) String() string {

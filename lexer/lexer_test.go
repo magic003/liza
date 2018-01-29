@@ -536,6 +536,7 @@ var tokens = []*token.Token{
 	{Type: token.PUBLIC, Content: "public"},
 	{Type: token.RETURN, Content: "return"},
 	{Type: token.NEWLINE, Content: "\n"},
+	{Type: token.VAR, Content: "var"},
 
 	// EOF
 	{Type: token.EOF, Content: ""},
