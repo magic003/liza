@@ -1558,3 +1558,105 @@ func TestValidExpr(t *testing.T) {
 		}
 	}
 }
+
+var validConstDeclTestCases = []struct {
+	desc     string
+	src      []byte
+	expected *ast.ConstDecl
+}{
+	{
+		desc: "const declaration without type",
+		src:  []byte("const x := 1"),
+		expected: &ast.ConstDecl{
+			Const: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Ident: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   7,
+				},
+				Content: "x",
+			},
+			Value: &ast.BasicLit{
+				Token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   12,
+					},
+					Content: "1",
+				},
+			},
+		},
+	},
+	{
+		desc: "const declaration with type",
+		src:  []byte("const x Int := 1"),
+		expected: &ast.ConstDecl{
+			Const: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Ident: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   7,
+				},
+				Content: "x",
+			},
+			Type: &ast.BasicType{
+				Ident: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   9,
+					},
+					Content: "Int",
+				},
+			},
+			Value: &ast.BasicLit{
+				Token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   16,
+					},
+					Content: "1",
+				},
+			},
+		},
+	},
+}
+
+func TestValidConstDecl(t *testing.T) {
+	for _, tc := range validConstDeclTestCases {
+		parser := New(filename, tc.src)
+
+		visibility := &token.Token{
+			Type: token.PUBLIC,
+			Position: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Content: "public",
+		}
+		result := parser.parseConstDecl(visibility)
+		tc.expected.Visibility = visibility
+
+		if !reflect.DeepEqual(tc.expected, result) {
+			t.Errorf("bad node for %s '%s':\ngot      %+v\nexpected %+v\n", tc.desc, tc.src, result, tc.expected)
+		}
+	}
+}
