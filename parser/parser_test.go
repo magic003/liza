@@ -1668,14 +1668,19 @@ var validVarDeclTestCases = []struct {
 }{
 	{
 		desc: "variable declaration without type",
-		src:  []byte("x := 1"),
+		src:  []byte("var x := 1"),
 		expected: &ast.VarDecl{
+			Var: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
 			Ident: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: filename,
 					Line:     1,
-					Column:   1,
+					Column:   5,
 				},
 				Content: "x",
 			},
@@ -1685,7 +1690,7 @@ var validVarDeclTestCases = []struct {
 					Position: token.Position{
 						Filename: filename,
 						Line:     1,
-						Column:   6,
+						Column:   10,
 					},
 					Content: "1",
 				},
@@ -1694,14 +1699,19 @@ var validVarDeclTestCases = []struct {
 	},
 	{
 		desc: "variable declaration with type",
-		src:  []byte("x Int := 1"),
+		src:  []byte("var x Int := 1"),
 		expected: &ast.VarDecl{
+			Var: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
 			Ident: &token.Token{
 				Type: token.IDENT,
 				Position: token.Position{
 					Filename: filename,
 					Line:     1,
-					Column:   1,
+					Column:   5,
 				},
 				Content: "x",
 			},
@@ -1711,7 +1721,7 @@ var validVarDeclTestCases = []struct {
 					Position: token.Position{
 						Filename: filename,
 						Line:     1,
-						Column:   3,
+						Column:   7,
 					},
 					Content: "Int",
 				},
@@ -1722,7 +1732,7 @@ var validVarDeclTestCases = []struct {
 					Position: token.Position{
 						Filename: filename,
 						Line:     1,
-						Column:   10,
+						Column:   14,
 					},
 					Content: "1",
 				},

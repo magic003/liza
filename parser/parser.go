@@ -253,6 +253,7 @@ func (p *Parser) parseParameterDef() *ast.ParameterDef {
 }
 
 func (p *Parser) parseVarDecl() *ast.VarDecl {
+	varPos := p.expect(token.VAR).Position
 	ident := p.expect(token.IDENT)
 	var tp ast.Type
 	if p.tok.Type != token.DEFINE {
@@ -262,6 +263,7 @@ func (p *Parser) parseVarDecl() *ast.VarDecl {
 	value := p.parseExpr()
 	p.expect(token.NEWLINE)
 	return &ast.VarDecl{
+		Var:   varPos,
 		Ident: ident,
 		Type:  tp,
 		Value: value,

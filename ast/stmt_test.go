@@ -16,14 +16,10 @@ var stmtTestCases = []struct {
 		desc: "DeclStmt",
 		stmt: &DeclStmt{
 			Decl: &VarDecl{
-				Ident: &token.Token{
-					Type: token.IDENT,
-					Position: token.Position{
-						Filename: "test.lz",
-						Line:     10,
-						Column:   26,
-					},
-					Content: "testVar",
+				Var: token.Position{
+					Filename: "test.lz",
+					Line:     10,
+					Column:   26,
 				},
 				Value: &BasicLit{
 					Token: &token.Token{

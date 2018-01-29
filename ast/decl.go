@@ -54,10 +54,11 @@ func (decl *ConstDecl) declNode() {}
 
 // VarDecl node represents a variable declaration.
 type VarDecl struct {
-	Visibility *token.Token // optional visibility
-	Ident      *token.Token // variable identifier
-	Type       Type         // optional constant type
-	Value      Expr         // variable initial value
+	Visibility *token.Token   // optional visibility
+	Var        token.Position // position of var
+	Ident      *token.Token   // variable identifier
+	Type       Type           // optional constant type
+	Value      Expr           // variable initial value
 }
 
 // Pos implementation for Node.
@@ -65,7 +66,7 @@ func (decl *VarDecl) Pos() token.Position {
 	if decl.Visibility != nil {
 		return decl.Visibility.Position
 	}
-	return decl.Ident.Position
+	return decl.Var
 }
 
 // End implementation for Node.
