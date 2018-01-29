@@ -1660,3 +1660,85 @@ func TestValidConstDecl(t *testing.T) {
 		}
 	}
 }
+
+var validVarDeclTestCases = []struct {
+	desc     string
+	src      []byte
+	expected *ast.VarDecl
+}{
+	{
+		desc: "variable declaration without type",
+		src:  []byte("x := 1"),
+		expected: &ast.VarDecl{
+			Ident: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Content: "x",
+			},
+			Value: &ast.BasicLit{
+				Token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   6,
+					},
+					Content: "1",
+				},
+			},
+		},
+	},
+	{
+		desc: "variable declaration with type",
+		src:  []byte("x Int := 1"),
+		expected: &ast.VarDecl{
+			Ident: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Content: "x",
+			},
+			Type: &ast.BasicType{
+				Ident: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   3,
+					},
+					Content: "Int",
+				},
+			},
+			Value: &ast.BasicLit{
+				Token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   10,
+					},
+					Content: "1",
+				},
+			},
+		},
+	},
+}
+
+func TestValidVarDecl(t *testing.T) {
+	for _, tc := range validVarDeclTestCases {
+		parser := New(filename, tc.src)
+
+		result := parser.parseVarDecl()
+
+		if !reflect.DeepEqual(tc.expected, result) {
+			t.Errorf("bad node for %s '%s':\ngot      %+v\nexpected %+v\n", tc.desc, tc.src, result, tc.expected)
+		}
+	}
+}

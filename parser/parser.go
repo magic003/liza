@@ -252,6 +252,22 @@ func (p *Parser) parseParameterDef() *ast.ParameterDef {
 	}
 }
 
+func (p *Parser) parseVarDecl() *ast.VarDecl {
+	ident := p.expect(token.IDENT)
+	var tp ast.Type
+	if p.tok.Type != token.DEFINE {
+		tp = p.parseType()
+	}
+	p.expect(token.DEFINE)
+	value := p.parseExpr()
+	p.expect(token.NEWLINE)
+	return &ast.VarDecl{
+		Ident: ident,
+		Type:  tp,
+		Value: value,
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Expression
 
