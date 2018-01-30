@@ -518,3 +518,225 @@ func (p *Parser) parseBasicOrSelectorType() ast.Type {
 		Ident: ident1,
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Statement
+
+func (p *Parser) parseStmt() ast.Stmt {
+	switch p.tok.Type {
+	case token.CONST:
+		return &ast.DeclStmt{Decl: p.parseConstDecl(nil)}
+	case token.VAR:
+		return &ast.DeclStmt{Decl: p.parseVarDecl()}
+	case token.RETURN:
+		return p.parseReturnStmt()
+	case token.BREAK, token.CONTINUE:
+		return p.parseBranchStmt()
+	case token.IF:
+		return p.parseIfStmt(true)
+	case token.MATCH:
+		return p.parseMatchStmt()
+	case token.FOR:
+		return p.parseForStmt()
+	default:
+		return p.parseSimpleStmt(true)
+	}
+}
+
+func (p *Parser) parseSimpleStmt(expectNewline bool) ast.Stmt {
+	expr := p.parseExpr()
+	var ret ast.Stmt
+	switch p.tok.Type {
+	case token.INC, token.DEC:
+		op := p.expect(p.tok.Type)
+		ret = &ast.IncDecStmt{
+			Expr: expr,
+			Op:   op,
+		}
+	case token.ASSIGN, token.ADDASSIGN, token.SUBASSIGN, token.MULASSIGN, token.DIVASSIGN, token.REMASSIGN,
+		token.ANDASSIGN, token.ORASSIGN, token.XORASSIGN, token.SHLASSIGN, token.SHRASSIGN:
+		assign := p.expect(p.tok.Type)
+		rhs := p.parseExpr()
+		ret = &ast.AssignStmt{
+			LHS:    expr,
+			Assign: assign,
+			RHS:    rhs,
+		}
+	default:
+		ret = &ast.ExprStmt{Expr: expr}
+	}
+
+	if expectNewline {
+		p.expect(token.NEWLINE)
+	}
+	return ret
+}
+
+func (p *Parser) parseReturnStmt() *ast.ReturnStmt {
+	ret := p.expect(token.RETURN)
+	value := p.parseExpr()
+	p.expect(token.NEWLINE)
+	return &ast.ReturnStmt{
+		Return: ret,
+		Value:  value,
+	}
+}
+
+func (p *Parser) parseBranchStmt() *ast.BranchStmt {
+	var tok *token.Token
+	if p.tok.Type == token.BREAK {
+		tok = p.expect(token.BREAK)
+	} else {
+		tok = p.expect(token.CONTINUE)
+	}
+	p.expect(token.NEWLINE)
+
+	return &ast.BranchStmt{
+		Tok: tok,
+	}
+}
+
+func (p *Parser) parseIfStmt(expectNewline bool) *ast.IfStmt {
+	ifPos := p.expect(token.IF).Position
+	cond := p.parseExpr()
+	body := p.parseBlockStmt()
+	var els *ast.ElseStmt
+	if p.tok.Type == token.ELSE {
+		els = p.parseElseStmt()
+	}
+	if expectNewline {
+		p.expect(token.NEWLINE)
+	}
+
+	return &ast.IfStmt{
+		If:   ifPos,
+		Cond: cond,
+		Body: body,
+		Else: els,
+	}
+}
+
+func (p *Parser) parseBlockStmt() *ast.BlockStmt {
+	lbrace := p.expect(token.LBRACE).Position
+	var stmts []ast.Stmt
+	for p.tok.Type != token.RBRACE && p.tok.Type != token.EOF {
+		stmts = append(stmts, p.parseStmt())
+	}
+	rbrace := p.expect(token.RBRACE).Position
+
+	return &ast.BlockStmt{
+		Lbrace: lbrace,
+		Stmts:  stmts,
+		Rbrace: rbrace,
+	}
+}
+
+func (p *Parser) parseElseStmt() *ast.ElseStmt {
+	elsePos := p.expect(token.ELSE).Position
+	var ifStmt *ast.IfStmt
+	var body *ast.BlockStmt
+	if p.tok.Type == token.IF {
+		ifStmt = p.parseIfStmt(false)
+	} else {
+		body = p.parseBlockStmt()
+	}
+
+	return &ast.ElseStmt{
+		Else: elsePos,
+		If:   ifStmt,
+		Body: body,
+	}
+}
+
+func (p *Parser) parseMatchStmt() *ast.MatchStmt {
+	match := p.expect(token.MATCH).Position
+	expr := p.parseExpr()
+	lbrace := p.expect(token.LBRACE).Position
+	var cases []*ast.CaseClause
+	for p.tok.Type != token.RBRACE && p.tok.Type != token.EOF {
+		cases = append(cases, p.parseCaseClause())
+	}
+	rbrace := p.expect(token.RBRACE).Position
+	p.expect(token.NEWLINE)
+
+	return &ast.MatchStmt{
+		Match:  match,
+		Expr:   expr,
+		Lbrace: lbrace,
+		Cases:  cases,
+		Rbrace: rbrace,
+	}
+}
+
+func (p *Parser) parseCaseClause() *ast.CaseClause {
+	var casePos token.Position
+	var pattern ast.Expr
+	if p.tok.Type == token.CASE {
+		casePos = p.expect(token.CASE).Position
+		pattern = p.parseExpr()
+	} else {
+		casePos = p.expect(token.DEFAULT).Position
+	}
+	colon := p.expect(token.COLON).Position
+	var body []ast.Stmt
+	for p.tok.Type != token.CASE && p.tok.Type != token.DEFAULT &&
+		p.tok.Type != token.RBRACE && p.tok.Type != token.EOF {
+		body = append(body, p.parseStmt())
+	}
+
+	return &ast.CaseClause{
+		Case:    casePos,
+		Pattern: pattern,
+		Colon:   colon,
+		Body:    body,
+	}
+}
+
+func (p *Parser) parseForStmt() *ast.ForStmt {
+	forPos := p.expect(token.FOR).Position
+	var (
+		decls []ast.Decl
+		cond  ast.Expr
+		post  ast.Stmt
+	)
+	if p.tok.Type != token.LBRACE {
+		if p.tok.Type != token.CONST && p.tok.Type != token.VAR && p.tok.Type != token.SEMICOLON {
+			cond = p.parseExpr()
+		} else {
+			for p.tok.Type != token.SEMICOLON && p.tok.Type != token.EOF {
+				if p.tok.Type == token.CONST {
+					decls = append(decls, p.parseConstDecl(nil))
+				} else if p.tok.Type == token.VAR {
+					decls = append(decls, p.parseVarDecl())
+				} else {
+					// TODO record error, sync to ',', ';', or '{' and return BadDecl
+				}
+
+				if p.tok.Type != token.SEMICOLON {
+					p.expect(token.COMMA)
+				}
+			}
+			p.expect(token.SEMICOLON)
+
+			if p.tok.Type != token.SEMICOLON {
+				cond = p.parseExpr()
+			}
+			p.expect(token.SEMICOLON)
+
+			if p.tok.Type != token.LBRACE {
+				post = p.parseSimpleStmt(false)
+			}
+		}
+	}
+
+	body := p.parseBlockStmt()
+	p.expect(token.NEWLINE)
+
+	return &ast.ForStmt{
+		For:   forPos,
+		Decls: decls,
+		Cond:  cond,
+		Post:  post,
+		Body:  body,
+	}
+}
