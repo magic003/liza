@@ -82,22 +82,24 @@ const (
 	// Keywords
 	AS
 	BREAK
+	CASE
 	CLASS
 	CONST
-	CONTINUE
 
+	CONTINUE
+	DEFAULT
 	ELSE
 	ENUM
 	FOR
+
 	FUN
 	IF
-
 	IMPLEMENTS
 	IMPORT
 	INTERFACE
+
 	MATCH
 	PACKAGE
-
 	PUBLIC
 	RETURN
 	VAR
@@ -168,27 +170,29 @@ var types = [...]string{
 	COLON:       ":",
 	DOUBLECOLON: "::",
 
-	AS:       "as",
-	BREAK:    "break",
-	CLASS:    "class",
-	CONST:    "const",
+	AS:    "as",
+	BREAK: "break",
+	CASE:  "case",
+	CLASS: "class",
+	CONST: "const",
+
 	CONTINUE: "continue",
+	DEFAULT:  "default",
+	ELSE:     "else",
+	ENUM:     "enum",
+	FOR:      "for",
 
-	ELSE: "else",
-	ENUM: "enum",
-	FOR:  "for",
-	FUN:  "fun",
-	IF:   "if",
-
+	FUN:        "fun",
+	IF:         "if",
 	IMPLEMENTS: "implements",
 	IMPORT:     "import",
 	INTERFACE:  "interface",
-	MATCH:      "match",
-	PACKAGE:    "package",
 
-	PUBLIC: "public",
-	RETURN: "return",
-	VAR:    "var",
+	MATCH:   "match",
+	PACKAGE: "package",
+	PUBLIC:  "public",
+	RETURN:  "return",
+	VAR:     "var",
 }
 
 func (ty Type) String() string {
