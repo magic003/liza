@@ -467,13 +467,18 @@ var stmtTestCases = []struct {
 	{
 		desc: "CaseClause",
 		stmt: &CaseClause{
+			Case: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
 			Pattern: &Ident{
 				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
 						Line:     10,
-						Column:   26,
+						Column:   31,
 					},
 					Content: "testVar",
 				},
@@ -481,7 +486,7 @@ var stmtTestCases = []struct {
 			Colon: token.Position{
 				Filename: "test.lz",
 				Line:     10,
-				Column:   34,
+				Column:   38,
 			},
 		},
 		expectedPos: token.Position{
@@ -492,19 +497,24 @@ var stmtTestCases = []struct {
 		expectedEnd: token.Position{
 			Filename: "test.lz",
 			Line:     10,
-			Column:   34,
+			Column:   38,
 		},
 	},
 	{
 		desc: "CaseClause",
 		stmt: &CaseClause{
+			Case: token.Position{
+				Filename: "test.lz",
+				Line:     10,
+				Column:   26,
+			},
 			Pattern: &Ident{
 				Token: &token.Token{
 					Type: token.IDENT,
 					Position: token.Position{
 						Filename: "test.lz",
 						Line:     10,
-						Column:   26,
+						Column:   31,
 					},
 					Content: "testVar",
 				},

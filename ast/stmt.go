@@ -229,6 +229,7 @@ func (stmt *MatchStmt) stmtNode() {}
 
 // CaseClause node represents a case clause in a match statement.
 type CaseClause struct {
+	Case    token.Position // position of case or default
 	Pattern Expr           // matched pattern
 	Colon   token.Position // position of ":"
 	Body    []Stmt         // optional statement list
@@ -236,7 +237,7 @@ type CaseClause struct {
 
 // Pos implementation for Node.
 func (stmt *CaseClause) Pos() token.Position {
-	return stmt.Pattern.Pos()
+	return stmt.Case
 }
 
 // End implementation for Node.
