@@ -76,6 +76,8 @@ const (
 	RBRACE      // }
 	COLON       // :
 	DOUBLECOLON // ::
+
+	SEMICOLON // ;
 	operatorEnd
 
 	keywordBeg
@@ -169,6 +171,8 @@ var types = [...]string{
 	RBRACE:      "}",
 	COLON:       ":",
 	DOUBLECOLON: "::",
+
+	SEMICOLON: ";",
 
 	AS:    "as",
 	BREAK: "break",

@@ -514,6 +514,7 @@ var tokens = []*token.Token{
 	{Type: token.NEWLINE, Content: "\n"},
 	{Type: token.COLON, Content: ":"},
 	{Type: token.DOUBLECOLON, Content: "::"},
+	{Type: token.SEMICOLON, Content: ";"},
 
 	// Keywords
 	{Type: token.AS, Content: "as"},
@@ -759,25 +760,28 @@ var lines = []string{
 	"}$\n",
 	":\n",
 	"::\n",
+	";\n",
 
 	"as\n",
 	"break$\n",
+	"case\n",
 	"class\n",
 	"const\n",
-	"continue$\n",
 
+	"continue$\n",
+	"default\n",
 	"else\n",
 	"enum\n",
 	"for\n",
+
 	"fun\n",
 	"if\n",
-
 	"implements\n",
 	"import\n",
 	"interface\n",
+
 	"match\n",
 	"package\n",
-
 	"public\n",
 	"return$\n",
 

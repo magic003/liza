@@ -201,6 +201,8 @@ scanAgain:
 			return &token.Token{Type: token.RBRACE, Position: pos, Content: string(l.src[startOffset:l.offset])}
 		case ',':
 			return &token.Token{Type: token.COMMA, Position: pos, Content: ","}
+		case ';':
+			return &token.Token{Type: token.SEMICOLON, Position: pos, Content: ";"}
 		}
 	}
 
