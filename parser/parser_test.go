@@ -1652,7 +1652,7 @@ func TestValidConstDecl(t *testing.T) {
 			},
 			Content: "public",
 		}
-		result := parser.parseConstDecl(visibility)
+		result := parser.parseConstDecl(visibility, true)
 		tc.expected.Visibility = visibility
 
 		if !reflect.DeepEqual(tc.expected, result) {
@@ -1745,7 +1745,1074 @@ func TestValidVarDecl(t *testing.T) {
 	for _, tc := range validVarDeclTestCases {
 		parser := New(filename, tc.src)
 
-		result := parser.parseVarDecl()
+		result := parser.parseVarDecl(true)
+
+		if !reflect.DeepEqual(tc.expected, result) {
+			t.Errorf("bad node for %s '%s':\ngot      %+v\nexpected %+v\n", tc.desc, tc.src, result, tc.expected)
+		}
+	}
+}
+
+var validStmtTestCases = []struct {
+	desc     string
+	src      []byte
+	expected ast.Stmt
+}{
+	{
+		desc: "const declaration statement",
+		src:  []byte("const x = 1"),
+		expected: &ast.DeclStmt{
+			Decl: &ast.ConstDecl{
+				Const: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Ident: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   7,
+					},
+					Content: "x",
+				},
+				Value: &ast.BasicLit{
+					Token: &token.Token{
+						Type: token.INT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   11,
+						},
+						Content: "1",
+					},
+				},
+			},
+		},
+	},
+	{
+		desc: "var declaration statement",
+		src:  []byte("var x = 1"),
+		expected: &ast.DeclStmt{
+			Decl: &ast.VarDecl{
+				Var: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Ident: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   5,
+					},
+					Content: "x",
+				},
+				Value: &ast.BasicLit{
+					Token: &token.Token{
+						Type: token.INT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   9,
+						},
+						Content: "1",
+					},
+				},
+			},
+		},
+	},
+	{
+		desc: "return nothing statement",
+		src:  []byte("return"),
+		expected: &ast.ReturnStmt{
+			Return: &token.Token{
+				Type: token.RETURN,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Content: "return",
+			},
+		},
+	},
+	{
+		desc: "return value statement",
+		src:  []byte("return 1"),
+		expected: &ast.ReturnStmt{
+			Return: &token.Token{
+				Type: token.RETURN,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Content: "return",
+			},
+			Value: &ast.BasicLit{
+				Token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   8,
+					},
+					Content: "1",
+				},
+			},
+		},
+	},
+	{
+		desc: "break statement",
+		src:  []byte("break"),
+		expected: &ast.BranchStmt{
+			Tok: &token.Token{
+				Type: token.BREAK,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Content: "break",
+			},
+		},
+	},
+	{
+		desc: "continue statement",
+		src:  []byte("continue"),
+		expected: &ast.BranchStmt{
+			Tok: &token.Token{
+				Type: token.CONTINUE,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   1,
+				},
+				Content: "continue",
+			},
+		},
+	},
+	{
+		desc: "expression statement",
+		src:  []byte("x.add()"),
+		expected: &ast.ExprStmt{
+			Expr: &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X: &ast.Ident{
+						Token: &token.Token{
+							Type: token.IDENT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     1,
+								Column:   1,
+							},
+							Content: "x",
+						},
+					},
+					Sel: &ast.Ident{
+						Token: &token.Token{
+							Type: token.IDENT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     1,
+								Column:   3,
+							},
+							Content: "add",
+						},
+					},
+				},
+				Lparen: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   6,
+				},
+				Rparen: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   7,
+				},
+			},
+		},
+	},
+	{
+		desc: "Increasement statement",
+		src:  []byte("a++"),
+		expected: &ast.IncDecStmt{
+			Expr: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   1,
+					},
+					Content: "a",
+				},
+			},
+			Op: &token.Token{
+				Type: token.INC,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   2,
+				},
+				Content: "++",
+			},
+		},
+	},
+	{
+		desc: "Decreasement statement",
+		src:  []byte("a--"),
+		expected: &ast.IncDecStmt{
+			Expr: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   1,
+					},
+					Content: "a",
+				},
+			},
+			Op: &token.Token{
+				Type: token.DEC,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   2,
+				},
+				Content: "--",
+			},
+		},
+	},
+	{
+		desc: "Assignment statement",
+		src:  []byte("a += 1"),
+		expected: &ast.AssignStmt{
+			LHS: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   1,
+					},
+					Content: "a",
+				},
+			},
+			Assign: &token.Token{
+				Type: token.ADDASSIGN,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   3,
+				},
+				Content: "+=",
+			},
+			RHS: &ast.BasicLit{
+				Token: &token.Token{
+					Type: token.INT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   6,
+					},
+					Content: "1",
+				},
+			},
+		},
+	},
+	{
+		desc: "if statement",
+		src: []byte("if x {\n" +
+			"add()\n" +
+			"x = !x\n" +
+			"}"),
+		expected: &ast.IfStmt{
+			If: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Cond: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   4,
+					},
+					Content: "x",
+				},
+			},
+			Body: &ast.BlockStmt{
+				Lbrace: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   6,
+				},
+				Stmts: []ast.Stmt{
+					&ast.ExprStmt{
+						Expr: &ast.CallExpr{
+							Fun: &ast.Ident{
+								Token: &token.Token{
+									Type: token.IDENT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     2,
+										Column:   1,
+									},
+									Content: "add",
+								},
+							},
+							Lparen: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   4,
+							},
+							Rparen: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   5,
+							},
+						},
+					},
+					&ast.AssignStmt{
+						LHS: &ast.Ident{
+							Token: &token.Token{
+								Type: token.IDENT,
+								Position: token.Position{
+									Filename: filename,
+									Line:     3,
+									Column:   1,
+								},
+								Content: "x",
+							},
+						},
+						Assign: &token.Token{
+							Type: token.ASSIGN,
+							Position: token.Position{
+								Filename: filename,
+								Line:     3,
+								Column:   3,
+							},
+							Content: "=",
+						},
+						RHS: &ast.UnaryExpr{
+							Op: &token.Token{
+								Type: token.NOT,
+								Position: token.Position{
+									Filename: filename,
+									Line:     3,
+									Column:   5,
+								},
+								Content: "!",
+							},
+							X: &ast.Ident{
+								Token: &token.Token{
+									Type: token.IDENT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     3,
+										Column:   6,
+									},
+									Content: "x",
+								},
+							},
+						},
+					},
+				},
+				Rbrace: token.Position{
+					Filename: filename,
+					Line:     4,
+					Column:   1,
+				},
+			},
+		},
+	},
+	{
+		desc: "if-else statement",
+		src: []byte("if x {\n" +
+			"add()\n" +
+			"} else {\n" +
+			"sub()\n" +
+			"}"),
+		expected: &ast.IfStmt{
+			If: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Cond: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   4,
+					},
+					Content: "x",
+				},
+			},
+			Body: &ast.BlockStmt{
+				Lbrace: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   6,
+				},
+				Stmts: []ast.Stmt{
+					&ast.ExprStmt{
+						Expr: &ast.CallExpr{
+							Fun: &ast.Ident{
+								Token: &token.Token{
+									Type: token.IDENT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     2,
+										Column:   1,
+									},
+									Content: "add",
+								},
+							},
+							Lparen: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   4,
+							},
+							Rparen: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   5,
+							},
+						},
+					},
+				},
+				Rbrace: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   1,
+				},
+			},
+			Else: &ast.ElseStmt{
+				Else: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   3,
+				},
+				Body: &ast.BlockStmt{
+					Lbrace: token.Position{
+						Filename: filename,
+						Line:     3,
+						Column:   8,
+					},
+					Stmts: []ast.Stmt{
+						&ast.ExprStmt{
+							Expr: &ast.CallExpr{
+								Fun: &ast.Ident{
+									Token: &token.Token{
+										Type: token.IDENT,
+										Position: token.Position{
+											Filename: filename,
+											Line:     4,
+											Column:   1,
+										},
+										Content: "sub",
+									},
+								},
+								Lparen: token.Position{
+									Filename: filename,
+									Line:     4,
+									Column:   4,
+								},
+								Rparen: token.Position{
+									Filename: filename,
+									Line:     4,
+									Column:   5,
+								},
+							},
+						},
+					},
+					Rbrace: token.Position{
+						Filename: filename,
+						Line:     5,
+						Column:   1,
+					},
+				},
+			},
+		},
+	},
+	{
+		desc: "if-else-if statement",
+		src: []byte("if x {\n" +
+			"add()\n" +
+			"} else if y {\n" +
+			"sub()\n" +
+			"}"),
+		expected: &ast.IfStmt{
+			If: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Cond: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   4,
+					},
+					Content: "x",
+				},
+			},
+			Body: &ast.BlockStmt{
+				Lbrace: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   6,
+				},
+				Stmts: []ast.Stmt{
+					&ast.ExprStmt{
+						Expr: &ast.CallExpr{
+							Fun: &ast.Ident{
+								Token: &token.Token{
+									Type: token.IDENT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     2,
+										Column:   1,
+									},
+									Content: "add",
+								},
+							},
+							Lparen: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   4,
+							},
+							Rparen: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   5,
+							},
+						},
+					},
+				},
+				Rbrace: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   1,
+				},
+			},
+			Else: &ast.ElseStmt{
+				Else: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   3,
+				},
+				If: &ast.IfStmt{
+					If: token.Position{
+						Filename: filename,
+						Line:     3,
+						Column:   8,
+					},
+					Cond: &ast.Ident{
+						Token: &token.Token{
+							Type: token.IDENT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     3,
+								Column:   11,
+							},
+							Content: "y",
+						},
+					},
+					Body: &ast.BlockStmt{
+						Lbrace: token.Position{
+							Filename: filename,
+							Line:     3,
+							Column:   13,
+						},
+						Stmts: []ast.Stmt{
+							&ast.ExprStmt{
+								Expr: &ast.CallExpr{
+									Fun: &ast.Ident{
+										Token: &token.Token{
+											Type: token.IDENT,
+											Position: token.Position{
+												Filename: filename,
+												Line:     4,
+												Column:   1,
+											},
+											Content: "sub",
+										},
+									},
+									Lparen: token.Position{
+										Filename: filename,
+										Line:     4,
+										Column:   4,
+									},
+									Rparen: token.Position{
+										Filename: filename,
+										Line:     4,
+										Column:   5,
+									},
+								},
+							},
+						},
+						Rbrace: token.Position{
+							Filename: filename,
+							Line:     5,
+							Column:   1,
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		desc: "match statement",
+		src: []byte("match x {\n" +
+			"case 1: return 1\n" +
+			"case 2: return 2\n" +
+			"default: return 3\n" +
+			"}"),
+		expected: &ast.MatchStmt{
+			Match: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Expr: &ast.Ident{
+				Token: &token.Token{
+					Type: token.IDENT,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   7,
+					},
+					Content: "x",
+				},
+			},
+			Lbrace: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   9,
+			},
+			Cases: []*ast.CaseClause{
+				{
+					Case: token.Position{
+						Filename: filename,
+						Line:     2,
+						Column:   1,
+					},
+					Pattern: &ast.BasicLit{
+						Token: &token.Token{
+							Type: token.INT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   6,
+							},
+							Content: "1",
+						},
+					},
+					Colon: token.Position{
+						Filename: filename,
+						Line:     2,
+						Column:   7,
+					},
+					Body: []ast.Stmt{
+						&ast.ReturnStmt{
+							Return: &token.Token{
+								Type: token.RETURN,
+								Position: token.Position{
+									Filename: filename,
+									Line:     2,
+									Column:   9,
+								},
+								Content: "return",
+							},
+							Value: &ast.BasicLit{
+								Token: &token.Token{
+									Type: token.INT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     2,
+										Column:   16,
+									},
+									Content: "1",
+								},
+							},
+						},
+					},
+				},
+				{
+					Case: token.Position{
+						Filename: filename,
+						Line:     3,
+						Column:   1,
+					},
+					Pattern: &ast.BasicLit{
+						Token: &token.Token{
+							Type: token.INT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     3,
+								Column:   6,
+							},
+							Content: "2",
+						},
+					},
+					Colon: token.Position{
+						Filename: filename,
+						Line:     3,
+						Column:   7,
+					},
+					Body: []ast.Stmt{
+						&ast.ReturnStmt{
+							Return: &token.Token{
+								Type: token.RETURN,
+								Position: token.Position{
+									Filename: filename,
+									Line:     3,
+									Column:   9,
+								},
+								Content: "return",
+							},
+							Value: &ast.BasicLit{
+								Token: &token.Token{
+									Type: token.INT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     3,
+										Column:   16,
+									},
+									Content: "2",
+								},
+							},
+						},
+					},
+				},
+				{
+					Case: token.Position{
+						Filename: filename,
+						Line:     4,
+						Column:   1,
+					},
+					Colon: token.Position{
+						Filename: filename,
+						Line:     4,
+						Column:   8,
+					},
+					Body: []ast.Stmt{
+						&ast.ReturnStmt{
+							Return: &token.Token{
+								Type: token.RETURN,
+								Position: token.Position{
+									Filename: filename,
+									Line:     4,
+									Column:   10,
+								},
+								Content: "return",
+							},
+							Value: &ast.BasicLit{
+								Token: &token.Token{
+									Type: token.INT,
+									Position: token.Position{
+										Filename: filename,
+										Line:     4,
+										Column:   17,
+									},
+									Content: "3",
+								},
+							},
+						},
+					},
+				},
+			},
+			Rbrace: token.Position{
+				Filename: filename,
+				Line:     5,
+				Column:   1,
+			},
+		},
+	},
+	{
+		desc: "infinite for statement",
+		src: []byte("for {\n" +
+			"a++\n" +
+			"}"),
+		expected: &ast.ForStmt{
+			For: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Body: &ast.BlockStmt{
+				Lbrace: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   5,
+				},
+				Stmts: []ast.Stmt{
+					&ast.IncDecStmt{
+						Expr: &ast.Ident{
+							Token: &token.Token{
+								Type: token.IDENT,
+								Position: token.Position{
+									Filename: filename,
+									Line:     2,
+									Column:   1,
+								},
+								Content: "a",
+							},
+						},
+						Op: &token.Token{
+							Type: token.INC,
+							Position: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   2,
+							},
+							Content: "++",
+						},
+					},
+				},
+				Rbrace: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   1,
+				},
+			},
+		},
+	},
+	{
+		desc: "for statement with condition only",
+		src: []byte("for a < 5 {\n" +
+			"a++\n" +
+			"}"),
+		expected: &ast.ForStmt{
+			For: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Cond: &ast.BinaryExpr{
+				X: &ast.Ident{
+					Token: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   5,
+						},
+						Content: "a",
+					},
+				},
+				Op: &token.Token{
+					Type: token.LSS,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   7,
+					},
+					Content: "<",
+				},
+				Y: &ast.BasicLit{
+					Token: &token.Token{
+						Type: token.INT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   9,
+						},
+						Content: "5",
+					},
+				},
+			},
+			Body: &ast.BlockStmt{
+				Lbrace: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   11,
+				},
+				Stmts: []ast.Stmt{
+					&ast.IncDecStmt{
+						Expr: &ast.Ident{
+							Token: &token.Token{
+								Type: token.IDENT,
+								Position: token.Position{
+									Filename: filename,
+									Line:     2,
+									Column:   1,
+								},
+								Content: "a",
+							},
+						},
+						Op: &token.Token{
+							Type: token.INC,
+							Position: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   2,
+							},
+							Content: "++",
+						},
+					},
+				},
+				Rbrace: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   1,
+				},
+			},
+		},
+	},
+	{
+		desc: "classic for statement",
+		src: []byte("for var i:=0; i < 5; i++ {\n" +
+			"a++\n" +
+			"}"),
+		expected: &ast.ForStmt{
+			For: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Decls: []ast.Decl{
+				&ast.VarDecl{
+					Var: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   5,
+					},
+					Ident: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   9,
+						},
+						Content: "i",
+					},
+					Value: &ast.BasicLit{
+						Token: &token.Token{
+							Type: token.INT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     1,
+								Column:   12,
+							},
+							Content: "0",
+						},
+					},
+				},
+			},
+			Cond: &ast.BinaryExpr{
+				X: &ast.Ident{
+					Token: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   15,
+						},
+						Content: "i",
+					},
+				},
+				Op: &token.Token{
+					Type: token.LSS,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   17,
+					},
+					Content: "<",
+				},
+				Y: &ast.BasicLit{
+					Token: &token.Token{
+						Type: token.INT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   19,
+						},
+						Content: "5",
+					},
+				},
+			},
+			Post: &ast.IncDecStmt{
+				Expr: &ast.Ident{
+					Token: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   22,
+						},
+						Content: "i",
+					},
+				},
+				Op: &token.Token{
+					Type: token.INC,
+					Position: token.Position{
+						Filename: filename,
+						Line:     1,
+						Column:   23,
+					},
+					Content: "++",
+				},
+			},
+			Body: &ast.BlockStmt{
+				Lbrace: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   26,
+				},
+				Stmts: []ast.Stmt{
+					&ast.IncDecStmt{
+						Expr: &ast.Ident{
+							Token: &token.Token{
+								Type: token.IDENT,
+								Position: token.Position{
+									Filename: filename,
+									Line:     2,
+									Column:   1,
+								},
+								Content: "a",
+							},
+						},
+						Op: &token.Token{
+							Type: token.INC,
+							Position: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   2,
+							},
+							Content: "++",
+						},
+					},
+				},
+				Rbrace: token.Position{
+					Filename: filename,
+					Line:     3,
+					Column:   1,
+				},
+			},
+		},
+	},
+}
+
+func TestValidStmt(t *testing.T) {
+	for _, tc := range validStmtTestCases {
+		parser := New(filename, tc.src)
+
+		result := parser.parseStmt()
 
 		if !reflect.DeepEqual(tc.expected, result) {
 			t.Errorf("bad node for %s '%s':\ngot      %+v\nexpected %+v\n", tc.desc, tc.src, result, tc.expected)

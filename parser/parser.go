@@ -150,7 +150,7 @@ func (p *Parser) parseTopLevelDecl() ast.Decl {
 
 	switch p.tok.Type {
 	case token.CONST:
-		return p.parseConstDecl(visibility)
+		return p.parseConstDecl(visibility, true)
 	case token.CLASS:
 		return p.parseClassDecl(visibility)
 	case token.INTERFACE:
@@ -166,7 +166,7 @@ func (p *Parser) parseTopLevelDecl() ast.Decl {
 	}
 }
 
-func (p *Parser) parseConstDecl(visibility *token.Token) *ast.ConstDecl {
+func (p *Parser) parseConstDecl(visibility *token.Token, expectNewline bool) *ast.ConstDecl {
 	constPos := p.expect(token.CONST).Position
 	ident := p.expect(token.IDENT)
 	var tp ast.Type
@@ -175,7 +175,9 @@ func (p *Parser) parseConstDecl(visibility *token.Token) *ast.ConstDecl {
 	}
 	p.expect(token.DEFINE)
 	value := p.parseExpr()
-	p.expect(token.NEWLINE)
+	if expectNewline {
+		p.expect(token.NEWLINE)
+	}
 	return &ast.ConstDecl{
 		Visibility: visibility,
 		Const:      constPos,
@@ -252,7 +254,7 @@ func (p *Parser) parseParameterDef() *ast.ParameterDef {
 	}
 }
 
-func (p *Parser) parseVarDecl() *ast.VarDecl {
+func (p *Parser) parseVarDecl(expectNewline bool) *ast.VarDecl {
 	varPos := p.expect(token.VAR).Position
 	ident := p.expect(token.IDENT)
 	var tp ast.Type
@@ -261,7 +263,9 @@ func (p *Parser) parseVarDecl() *ast.VarDecl {
 	}
 	p.expect(token.DEFINE)
 	value := p.parseExpr()
-	p.expect(token.NEWLINE)
+	if expectNewline {
+		p.expect(token.NEWLINE)
+	}
 	return &ast.VarDecl{
 		Var:   varPos,
 		Ident: ident,
@@ -525,9 +529,9 @@ func (p *Parser) parseBasicOrSelectorType() ast.Type {
 func (p *Parser) parseStmt() ast.Stmt {
 	switch p.tok.Type {
 	case token.CONST:
-		return &ast.DeclStmt{Decl: p.parseConstDecl(nil)}
+		return &ast.DeclStmt{Decl: p.parseConstDecl(nil, true)}
 	case token.VAR:
-		return &ast.DeclStmt{Decl: p.parseVarDecl()}
+		return &ast.DeclStmt{Decl: p.parseVarDecl(true)}
 	case token.RETURN:
 		return p.parseReturnStmt()
 	case token.BREAK, token.CONTINUE:
@@ -705,9 +709,9 @@ func (p *Parser) parseForStmt() *ast.ForStmt {
 		} else {
 			for p.tok.Type != token.SEMICOLON && p.tok.Type != token.EOF {
 				if p.tok.Type == token.CONST {
-					decls = append(decls, p.parseConstDecl(nil))
+					decls = append(decls, p.parseConstDecl(nil, false))
 				} else if p.tok.Type == token.VAR {
-					decls = append(decls, p.parseVarDecl())
+					decls = append(decls, p.parseVarDecl(false))
 				} else {
 					// TODO record error, sync to ',', ';', or '{' and return BadDecl
 				}
