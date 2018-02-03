@@ -188,7 +188,51 @@ func (p *Parser) parseConstDecl(visibility *token.Token, expectNewline bool) *as
 }
 
 func (p *Parser) parseClassDecl(visibility *token.Token) *ast.ClassDecl {
-	return nil
+	class := p.expect(token.CLASS).Position
+	name := p.expect(token.IDENT)
+	var implements []*ast.SelectorType
+	if p.tok.Type == token.IMPLEMENTS {
+		p.expect(token.IMPLEMENTS)
+		for p.tok.Type != token.LBRACE && p.tok.Type != token.EOF {
+			tp := p.parseBasicOrSelectorType()
+			selectorType, ok := tp.(*ast.SelectorType)
+			if !ok {
+				// TODO record error and sync
+			}
+			implements = append(implements, selectorType)
+			if p.tok.Type != token.LBRACE {
+				p.expect(token.COMMA)
+			}
+		}
+	}
+
+	lbrace := p.expect(token.LBRACE).Position
+	var (
+		consts  []*ast.ConstDecl
+		vars    []*ast.VarDecl
+		methods []*ast.FuncDecl
+	)
+	for p.tok.Type == token.CONST {
+		consts = append(consts, p.parseConstDecl(nil, true))
+	}
+	for p.tok.Type == token.VAR {
+		vars = append(vars, p.parseVarDecl(true))
+	}
+	for p.tok.Type == token.PUBLIC || p.tok.Type == token.FUN {
+		methods = append(methods, p.parseFuncDecl())
+	}
+	rbrace := p.expect(token.RBRACE).Position
+	return &ast.ClassDecl{
+		Visibility: visibility,
+		Class:      class,
+		Name:       name,
+		Implements: implements,
+		Lbrace:     lbrace,
+		Consts:     consts,
+		Vars:       vars,
+		Methods:    methods,
+		Rbrace:     rbrace,
+	}
 }
 
 func (p *Parser) parseInterfaceDecl(visibility *token.Token) *ast.InterfaceDecl {
@@ -215,6 +259,25 @@ func (p *Parser) parseFuncDef() *ast.FuncDef {
 	funcDef := p.parseFuncSignature()
 	p.expect(token.NEWLINE)
 	return funcDef
+}
+
+func (p *Parser) parseFuncDecl() *ast.FuncDecl {
+	var visibility *token.Token
+	if p.tok.Type == token.PUBLIC {
+		visibility = p.expect(token.PUBLIC)
+	}
+
+	signature := p.parseFuncSignature()
+	body := p.parseBlockStmt()
+	p.expect(token.NEWLINE)
+	return &ast.FuncDecl{
+		Visibility: visibility,
+		Fun:        signature.Fun,
+		Name:       signature.Name,
+		Params:     signature.Params,
+		ReturnType: signature.ReturnType,
+		Body:       body,
+	}
 }
 
 func (p *Parser) parseFuncSignature() *ast.FuncDef {

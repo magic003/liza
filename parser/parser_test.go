@@ -2819,3 +2819,331 @@ func TestValidStmt(t *testing.T) {
 		}
 	}
 }
+
+var validClassDeclTestCases = []struct {
+	desc     string
+	src      []byte
+	expected *ast.ClassDecl
+}{
+	{
+		desc: "class declaration",
+		src: []byte("class Hello {\n" +
+			"const a = \"a\"\n" +
+			"var b = 1\n" +
+			"fun say() {\n" +
+			"	print(a)\n" +
+			"}\n" +
+			"}"),
+		expected: &ast.ClassDecl{
+			Class: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Name: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   7,
+				},
+				Content: "Hello",
+			},
+			Lbrace: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   13,
+			},
+			Consts: []*ast.ConstDecl{
+				{
+					Const: token.Position{
+						Filename: filename,
+						Line:     2,
+						Column:   1,
+					},
+					Ident: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     2,
+							Column:   7,
+						},
+						Content: "a",
+					},
+					Value: &ast.BasicLit{
+						Token: &token.Token{
+							Type: token.STRING,
+							Position: token.Position{
+								Filename: filename,
+								Line:     2,
+								Column:   11,
+							},
+							Content: "\"a\"",
+						},
+					},
+				},
+			},
+			Vars: []*ast.VarDecl{
+				{
+					Var: token.Position{
+						Filename: filename,
+						Line:     3,
+						Column:   1,
+					},
+					Ident: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     3,
+							Column:   5,
+						},
+						Content: "b",
+					},
+					Value: &ast.BasicLit{
+						Token: &token.Token{
+							Type: token.INT,
+							Position: token.Position{
+								Filename: filename,
+								Line:     3,
+								Column:   9,
+							},
+							Content: "1",
+						},
+					},
+				},
+			},
+			Methods: []*ast.FuncDecl{
+				{
+					Fun: token.Position{
+						Filename: filename,
+						Line:     4,
+						Column:   1,
+					},
+					Name: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     4,
+							Column:   5,
+						},
+						Content: "say",
+					},
+					Body: &ast.BlockStmt{
+						Lbrace: token.Position{
+							Filename: filename,
+							Line:     4,
+							Column:   11,
+						},
+						Stmts: []ast.Stmt{
+							&ast.ExprStmt{
+								Expr: &ast.CallExpr{
+									Fun: &ast.Ident{
+										Token: &token.Token{
+											Type: token.IDENT,
+											Position: token.Position{
+												Filename: filename,
+												Line:     5,
+												Column:   2,
+											},
+											Content: "print",
+										},
+									},
+									Lparen: token.Position{
+										Filename: filename,
+										Line:     5,
+										Column:   7,
+									},
+									Args: []ast.Expr{
+										&ast.Ident{
+											Token: &token.Token{
+												Type: token.IDENT,
+												Position: token.Position{
+													Filename: filename,
+													Line:     5,
+													Column:   8,
+												},
+												Content: "a",
+											},
+										},
+									},
+									Rparen: token.Position{
+										Filename: filename,
+										Line:     5,
+										Column:   9,
+									},
+								},
+							},
+						},
+						Rbrace: token.Position{
+							Filename: filename,
+							Line:     6,
+							Column:   1,
+						},
+					},
+				},
+			},
+			Rbrace: token.Position{
+				Filename: filename,
+				Line:     7,
+				Column:   1,
+			},
+		},
+	},
+	{
+		desc: "class declaration implementing interfaces",
+		src: []byte("class Hello implements lib.Hello {\n" +
+			"public fun say() {\n" +
+			"	print(a)\n" +
+			"}\n" +
+			"}"),
+		expected: &ast.ClassDecl{
+			Class: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Name: &token.Token{
+				Type: token.IDENT,
+				Position: token.Position{
+					Filename: filename,
+					Line:     1,
+					Column:   7,
+				},
+				Content: "Hello",
+			},
+			Implements: []*ast.SelectorType{
+				{
+					Package: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   24,
+						},
+						Content: "lib",
+					},
+					Sel: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     1,
+							Column:   28,
+						},
+						Content: "Hello",
+					},
+				},
+			},
+			Lbrace: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   34,
+			},
+			Methods: []*ast.FuncDecl{
+				{
+					Visibility: &token.Token{
+						Type: token.PUBLIC,
+						Position: token.Position{
+							Filename: filename,
+							Line:     2,
+							Column:   1,
+						},
+						Content: "public",
+					},
+					Fun: token.Position{
+						Filename: filename,
+						Line:     2,
+						Column:   8,
+					},
+					Name: &token.Token{
+						Type: token.IDENT,
+						Position: token.Position{
+							Filename: filename,
+							Line:     2,
+							Column:   12,
+						},
+						Content: "say",
+					},
+					Body: &ast.BlockStmt{
+						Lbrace: token.Position{
+							Filename: filename,
+							Line:     2,
+							Column:   18,
+						},
+						Stmts: []ast.Stmt{
+							&ast.ExprStmt{
+								Expr: &ast.CallExpr{
+									Fun: &ast.Ident{
+										Token: &token.Token{
+											Type: token.IDENT,
+											Position: token.Position{
+												Filename: filename,
+												Line:     3,
+												Column:   2,
+											},
+											Content: "print",
+										},
+									},
+									Lparen: token.Position{
+										Filename: filename,
+										Line:     3,
+										Column:   7,
+									},
+									Args: []ast.Expr{
+										&ast.Ident{
+											Token: &token.Token{
+												Type: token.IDENT,
+												Position: token.Position{
+													Filename: filename,
+													Line:     3,
+													Column:   8,
+												},
+												Content: "a",
+											},
+										},
+									},
+									Rparen: token.Position{
+										Filename: filename,
+										Line:     3,
+										Column:   9,
+									},
+								},
+							},
+						},
+						Rbrace: token.Position{
+							Filename: filename,
+							Line:     4,
+							Column:   1,
+						},
+					},
+				},
+			},
+			Rbrace: token.Position{
+				Filename: filename,
+				Line:     5,
+				Column:   1,
+			},
+		},
+	},
+}
+
+func TestValidClassDecl(t *testing.T) {
+	for _, tc := range validClassDeclTestCases {
+		parser := New(filename, tc.src)
+
+		visibility := &token.Token{
+			Type: token.PUBLIC,
+			Position: token.Position{
+				Filename: filename,
+				Line:     1,
+				Column:   1,
+			},
+			Content: "public",
+		}
+		result := parser.parseClassDecl(visibility)
+		tc.expected.Visibility = visibility
+
+		if !reflect.DeepEqual(tc.expected, result) {
+			t.Errorf("bad node for %s '%s':\ngot      %+v\nexpected %+v\n", tc.desc, tc.src, result, tc.expected)
+		}
+	}
+}
