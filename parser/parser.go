@@ -222,6 +222,7 @@ func (p *Parser) parseClassDecl(visibility *token.Token) *ast.ClassDecl {
 		methods = append(methods, p.parseFuncDecl())
 	}
 	rbrace := p.expect(token.RBRACE).Position
+	p.expect(token.NEWLINE)
 	return &ast.ClassDecl{
 		Visibility: visibility,
 		Class:      class,
@@ -805,5 +806,37 @@ func (p *Parser) parseForStmt() *ast.ForStmt {
 		Cond:  cond,
 		Post:  post,
 		Body:  body,
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Parse file
+
+func (p *Parser) parseFile() *ast.File {
+	// Don't parse it if we had errors scanning the first token.
+	if len(p.errors) != 0 {
+		return nil
+	}
+
+	packageDecl := p.parsePackageDecl()
+	// Don't parse it if we had errors parsing the package declaration.
+	if len(p.errors) != 0 {
+		return nil
+	}
+
+	var imports []*ast.ImportDecl
+	for p.tok.Type == token.IMPORT {
+		imports = append(imports, p.parseImportDecl())
+	}
+
+	var decls []ast.Decl
+	for p.tok.Type != token.EOF {
+		decls = append(decls, p.parseTopLevelDecl())
+	}
+
+	return &ast.File{
+		Package: packageDecl,
+		Imports: imports,
+		Decls:   decls,
 	}
 }
