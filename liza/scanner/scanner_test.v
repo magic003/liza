@@ -5,7 +5,9 @@ fn test_from_file() ? {
 	assert 'liza/scanner/testdata/dummy.lz' == scanner.file_path
 	assert 'dummy.lz' == scanner.file_name
 	assert 'module dummy' == scanner.text.trim_space()
-	assert 0 == scanner.idx
+	assert 0 == scanner.pos
+	assert 0 == scanner.line
+	assert 0 == scanner.col
 	assert 0 == scanner.errors.len
 }
 
@@ -22,6 +24,8 @@ fn test_from_text() {
 	assert 'memory' == scanner.file_path
 	assert 'memory' == scanner.file_name
 	assert 'dummy text' == scanner.text
-	assert 0 == scanner.idx
+	assert 0 == scanner.pos
+	assert 0 == scanner.line
+	assert 0 == scanner.col
 	assert 0 == scanner.errors.len
 }
